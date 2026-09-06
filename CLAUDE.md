@@ -121,6 +121,20 @@ was worth building. Extract and split are `mergeDocuments` pointed at a subset, 
 `pageSize: 'original'` so a document that is only being rearranged is not silently refitted to
 A4.
 
+**The session survives moving between tools, and lives in memory only.** Each tool is its own
+route, so its component unmounts on the way out; the state therefore cannot live in that
+component. `app/_lib/document-store.js` is a module-level store — files, pages, undo history,
+the open pdf.js documents and the decoded rasters — and `useDocumentSession()` is a
+`useSyncExternalStore` binding over it. Someone who has just arranged forty pages in Organise
+and then clicks Split has not asked to start again, and the previews do not re-render either.
+
+⚠️ **Nothing in that store is written to disk. Do not "improve" it with IndexedDB or
+sessionStorage.** Reading a file into this tab and never letting it out is the whole product;
+persisting user documents to disk is a different product with a different threat model. A
+reload is a fresh start, which is why the `beforeunload` guard exists. Transient interaction
+state (which page is being cropped, what is being dragged) deliberately stays in the component,
+because it *should* reset when the tool changes.
+
 ### Static assets are resolved from the app root, never `document.baseURI`
 `lib/asset-path.js` exists because of a real, silent bug. The merge worker used to be loaded as
 `new Worker(new URL('merge-worker.js', document.baseURI))`, which worked while `/` was the only

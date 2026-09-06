@@ -20,6 +20,10 @@ I can't trust some files on online tools, so I built a simple local solution
 | **[Extract](https://merge-pdf.nicanor.xyz/extract)** | Make a new PDF from the pages you pick |
 | **[Split](https://merge-pdf.nicanor.xyz/split)** | Break one PDF into several files — by range, every N pages, or one per page — downloaded as a zip |
 
+Your files carry over between tools — merge a few documents, switch to Organise to rearrange
+them, then Split the result, without loading anything twice. Nothing is written to disk on the
+way; the session lives in the tab, so a reload is a fresh start.
+
 More are on the way; see [docs/ROADMAP.md](docs/ROADMAP.md) for what and in what order.
 
 ## Features

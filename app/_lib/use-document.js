@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState, useSyncExternalStore } from 'react';
 import {
   generateId,
   isAcceptedFile,
@@ -18,66 +18,38 @@ import {
   renderKey,
   rotatePage,
 } from '../../lib/pages';
+import * as store from './document-store';
 import { MAX_CACHED_RASTERS, PREVIEW_SCALE, loadPdfjs } from './pdf-render';
 
-// Undo depth. Deep enough to walk back a run of mistaken edits, bounded so a long session
-// cannot retain thousands of page arrays.
-const HISTORY_LIMIT = 50;
-
 /**
- * The document session: the sources the user added, the pages of the output, the rendered
- * rasters, and the undo stack over all of it.
+ * The document session, as a React binding over the store in ./document-store.js.
  *
- * Every tool in the app works on the same model — `pages[]`, where an entry is one page of the
- * *output* holding a pointer back to a source plus the transforms applied to it. Merge, extract,
- * split and organise differ only in what they do with that array at the end, which is why they
- * can share this hook rather than each growing their own copy of it.
+ * Every tool works on the same model — `pages[]`, where an entry is one page of the *output*
+ * holding a pointer back to a source plus the transforms applied to it. Merge, extract, split
+ * and organise differ only in what they do with that array at the end, which is why they share
+ * this hook rather than each growing their own copy of it.
+ *
+ * The state lives outside React so it survives moving between tools: switching from Organise
+ * to Split unmounts one route and mounts another, and the files must not go with it.
+ *
+ * Transient interaction state — which page is being cropped, what is being dragged — stays in
+ * the component, because it genuinely should reset when the tool changes.
  */
 export function useDocumentSession() {
-  const [files, setFiles] = useState([]);
-  const [pages, setPages] = useState([]);
+  const { files, pages, historyDepth, countsVersion } = useSyncExternalStore(
+    store.subscribe,
+    store.getSnapshot,
+    store.getServerSnapshot,
+  );
+
   const [toast, setToast] = useState(null);
   const [liveMessage, setLiveMessage] = useState('');
   const [croppingId, setCroppingId] = useState(null);
   const [draggedId, setDraggedId] = useState(null);
   const [dragTargetId, setDragTargetId] = useState(null);
-  // Bumped when a source's page count becomes known, to trigger reconciliation.
-  const [countsVersion, setCountsVersion] = useState(0);
-  const [historyDepth, setHistoryDepth] = useState(0);
-
-  const toastTimer = useRef(null);
-  // Mirrors, so effects and callbacks can read current values without re-subscribing.
-  const filesRef = useRef(files);
-  filesRef.current = files;
-  const pagesRef = useRef(pages);
-  pagesRef.current = pages;
-  // fileId -> { pdf, task, pageCount, failed }. Each source is parsed once and kept open while
-  // it is in the list, so rendering page 40 does not re-read the file.
-  const docsRef = useRef(new Map());
-  // renderKey -> ImageBitmap. Survives reorder, rotation, crop, and deletion of other pages.
-  const rasterRef = useRef(new Map());
-  // Sources whose pages have been generated once, so a document the user has emptied page by
-  // page does not silently refill itself.
-  const seenRef = useRef(new Set());
-  // Previous page arrays, newest last. The page model is immutable, so an undo stack is just
-  // a list of the arrays we replaced — no inverse operations to write and get wrong.
-  const historyRef = useRef([]);
-
-  useEffect(() => {
-    const docs = docsRef.current;
-    const rasters = rasterRef.current;
-    return () => {
-      filesRef.current.forEach((f) => {
-        if (f.thumbUrl) URL.revokeObjectURL(f.thumbUrl);
-      });
-      docs.forEach((entry) => entry.task?.destroy?.());
-      docs.clear();
-      rasters.clear();
-    };
-  }, []);
 
   // Arranging fifty pages and then closing the tab loses all of it — there is no server-side
-  // copy to come back to, by design.
+  // copy to come back to, by design, and nothing is written to disk.
   useEffect(() => {
     if (pages.length === 0) return undefined;
     const warn = (event) => {
@@ -89,6 +61,9 @@ export function useDocumentSession() {
   }, [pages.length]);
 
   // -- Toast / announcements --
+
+  const toastTimer = useRef(null);
+  useEffect(() => () => clearTimeout(toastTimer.current), []);
 
   const showToast = useCallback((msg, isError = false) => {
     setToast({ message: msg, isError });
@@ -109,11 +84,10 @@ export function useDocumentSession() {
     let cancelled = false;
 
     (async () => {
-      const docs = docsRef.current;
       let changed = false;
 
       for (const entry of files) {
-        if (docs.has(entry.id)) continue;
+        if (store.docs.has(entry.id)) continue;
         try {
           if (entry.type === 'application/pdf') {
             const lib = await loadPdfjs();
@@ -128,18 +102,18 @@ export function useDocumentSession() {
               task.destroy();
               return;
             }
-            docs.set(entry.id, { pdf, task, pageCount: pdf.numPages });
+            store.docs.set(entry.id, { pdf, task, pageCount: pdf.numPages });
           } else {
-            docs.set(entry.id, { pdf: null, task: null, pageCount: 1 });
+            store.docs.set(entry.id, { pdf: null, task: null, pageCount: 1 });
           }
         } catch (err) {
           console.error('Could not read file:', entry.name, err);
-          docs.set(entry.id, { pdf: null, task: null, pageCount: 0, failed: true });
+          store.docs.set(entry.id, { pdf: null, task: null, pageCount: 0, failed: true });
         }
         changed = true;
       }
 
-      if (!cancelled && changed) setCountsVersion((v) => v + 1);
+      if (!cancelled && changed) store.bumpCounts();
     })();
 
     return () => {
@@ -150,37 +124,32 @@ export function useDocumentSession() {
   // -- Keep the page list in step with the sources --
 
   useEffect(() => {
-    const docs = docsRef.current;
     const known = files
-      .filter((f) => docs.has(f.id))
-      .map((f) => ({ fileId: f.id, pageCount: docs.get(f.id).pageCount }));
+      .filter((f) => store.docs.has(f.id))
+      .map((f) => ({ fileId: f.id, pageCount: store.docs.get(f.id).pageCount }));
 
-    const next = reconcilePages(pagesRef.current, known, seenRef.current);
+    const next = reconcilePages(store.getPages(), known, store.seen);
     for (const source of known) {
-      if (source.pageCount > 0) seenRef.current.add(source.fileId);
+      if (source.pageCount > 0) store.seen.add(source.fileId);
     }
-    if (next !== pagesRef.current) {
-      // Adding or removing a document changes which pages exist at all, so earlier
-      // arrangements refer to pages that may be gone. Undoing into one would be incoherent.
-      historyRef.current = [];
-      setHistoryDepth(0);
-      setPages(next);
-    }
+    // Adding or removing a document changes which pages exist at all, so earlier arrangements
+    // refer to pages that may be gone. Undoing into one would be incoherent, so resetPages
+    // clears the history.
+    store.resetPages(next);
   }, [files, countsVersion]);
 
   // -- Rendering --
 
   const getBitmap = useCallback(async (page) => {
     const key = renderKey(page);
-    const cache = rasterRef.current;
-    if (cache.has(key)) return cache.get(key);
+    if (store.rasters.has(key)) return store.rasters.get(key);
 
-    const source = filesRef.current.find((f) => f.id === page.fileId);
+    const source = store.getFiles().find((f) => f.id === page.fileId);
     if (!source) throw new Error('Source file is no longer available');
 
     let bitmap;
     if (source.type === 'application/pdf') {
-      const pdf = docsRef.current.get(page.fileId)?.pdf;
+      const pdf = store.docs.get(page.fileId)?.pdf;
       if (!pdf) throw new Error('Document is not open');
       const pdfPage = await pdf.getPage(page.sourceIndex + 1);
       const viewport = pdfPage.getViewport({ scale: PREVIEW_SCALE });
@@ -195,9 +164,11 @@ export function useDocumentSession() {
       bitmap = await createImageBitmap(source.file);
     }
 
-    cache.set(key, bitmap);
-    while (cache.size > MAX_CACHED_RASTERS) {
-      cache.delete(cache.keys().next().value);
+    store.rasters.set(key, bitmap);
+    // Evicted entries are dropped rather than close()d: a component may still hold one, and
+    // drawing a closed bitmap throws.
+    while (store.rasters.size > MAX_CACHED_RASTERS) {
+      store.rasters.delete(store.rasters.keys().next().value);
     }
     return bitmap;
   }, []);
@@ -206,6 +177,7 @@ export function useDocumentSession() {
 
   const addFiles = useCallback(
     (fileList) => {
+      const current = store.getFiles();
       const newEntries = [];
       let skippedUnsupported = 0;
       let skippedEmpty = 0;
@@ -222,7 +194,7 @@ export function useDocumentSession() {
         }
         // Added anyway — someone may genuinely want the same document twice — but say so,
         // because dropping a folder twice is the more common reason to see this.
-        if (filesRef.current.some((f) => f.name === file.name && f.size === file.size)) {
+        if (current.some((f) => f.name === file.name && f.size === file.size)) {
           duplicates++;
         }
         const type = resolveType(file);
@@ -247,8 +219,8 @@ export function useDocumentSession() {
       }
 
       if (newEntries.length > 0) {
-        const next = [...filesRef.current, ...newEntries];
-        setFiles(next);
+        const next = [...current, ...newEntries];
+        store.setFiles(next);
         const totalBytes = next.reduce((sum, f) => sum + f.size, 0);
         if (next.length > LARGE_FILE_COUNT || totalBytes > LARGE_TOTAL_BYTES) {
           showToast('Large selection - this may take a while or use a lot of memory.', true);
@@ -258,76 +230,43 @@ export function useDocumentSession() {
     [showToast],
   );
 
-  const forgetFile = useCallback((entry) => {
-    if (entry.thumbUrl) URL.revokeObjectURL(entry.thumbUrl);
-    docsRef.current.get(entry.id)?.task?.destroy?.();
-    docsRef.current.delete(entry.id);
-    seenRef.current.delete(entry.id);
-    for (const key of [...rasterRef.current.keys()]) {
-      if (key.startsWith(`${entry.id}:`)) rasterRef.current.delete(key);
-    }
-  }, []);
-
   const removeFile = useCallback(
     (id) => {
-      const entry = filesRef.current.find((f) => f.id === id);
+      const entry = store.getFiles().find((f) => f.id === id);
       if (!entry) return;
-      forgetFile(entry);
+      store.forget(entry);
       announce(`Removed ${entry.name}`);
-      setFiles((prev) => prev.filter((f) => f.id !== id));
+      store.setFiles(store.getFiles().filter((f) => f.id !== id));
     },
-    [announce, forgetFile],
+    [announce],
   );
 
   const clearAll = useCallback(() => {
-    const current = filesRef.current;
+    const current = store.getFiles();
     if (current.length === 0) return;
     // Guard against accidental loss of the whole queue.
     if (typeof window !== 'undefined' && !window.confirm(`Remove all ${current.length} files?`)) {
       return;
     }
-    current.forEach(forgetFile);
-    announce('Cleared all files');
     setCroppingId(null);
-    historyRef.current = [];
-    setHistoryDepth(0);
-    setPages([]);
-    setFiles([]);
-  }, [announce, forgetFile]);
+    store.clearAll();
+    announce('Cleared all files');
+  }, [announce]);
 
   // -- Page operations --
 
   const grouped = useMemo(() => arePagesGroupedByFile(pages), [pages]);
 
-  /**
-   * Apply a page operation, remembering the previous arrangement so it can be undone.
-   *
-   * Every user-facing page edit goes through here. Operations that change nothing (moving the
-   * first page up, cropping to the full page) return the same array and are not recorded, so
-   * undo never appears to do nothing.
-   */
   const mutate = useCallback(
     (fn, message) => {
-      const prev = pagesRef.current;
-      const next = fn(prev);
-      if (next === prev) return;
-      historyRef.current = [...historyRef.current, prev].slice(-HISTORY_LIMIT);
-      setHistoryDepth(historyRef.current.length);
-      setPages(next);
-      if (message) announce(message);
+      if (store.mutatePages(fn) && message) announce(message);
     },
     [announce],
   );
 
   const undo = useCallback(() => {
-    const past = historyRef.current;
-    if (past.length === 0) return;
-    const restored = past[past.length - 1];
-    historyRef.current = past.slice(0, -1);
-    setHistoryDepth(historyRef.current.length);
     setCroppingId(null);
-    setPages(restored);
-    announce('Undid the last change');
+    if (store.undoPages()) announce('Undid the last change');
   }, [announce]);
 
   useEffect(() => {
@@ -345,7 +284,7 @@ export function useDocumentSession() {
 
   const moveDocument = useCallback(
     (fileId, direction) => {
-      const entry = filesRef.current.find((f) => f.id === fileId);
+      const entry = store.getFiles().find((f) => f.id === fileId);
       mutate(
         (prev) => moveFileBlock(prev, fileId, direction),
         `Moved ${entry?.name ?? 'document'} ${direction < 0 ? 'earlier' : 'later'}`,
@@ -363,7 +302,7 @@ export function useDocumentSession() {
 
   const onDeletePage = useCallback(
     (id) => {
-      const index = pagesRef.current.findIndex((p) => p.id === id);
+      const index = store.getPages().findIndex((p) => p.id === id);
       setCroppingId((current) => (current === id ? null : current));
       mutate((prev) => removePage(prev, id), `Removed page ${index + 1}. Press Control or Command Z to undo.`);
     },
@@ -372,10 +311,11 @@ export function useDocumentSession() {
 
   const onMovePage = useCallback(
     (id, direction) => {
-      const from = pagesRef.current.findIndex((p) => p.id === id);
+      const list = store.getPages();
+      const from = list.findIndex((p) => p.id === id);
       const to = from + direction;
-      if (to < 0 || to >= pagesRef.current.length) return;
-      mutate((prev) => movePage(prev, id, to), `Moved page to position ${to + 1} of ${pagesRef.current.length}`);
+      if (to < 0 || to >= list.length) return;
+      mutate((prev) => movePage(prev, id, to), `Moved page to position ${to + 1} of ${list.length}`);
     },
     [mutate],
   );
@@ -429,7 +369,7 @@ export function useDocumentSession() {
 
   /** The sources in the shape the merge worker wants: no React state, no object URLs. */
   const asSources = useCallback(
-    () => filesRef.current.map((f) => ({ fileId: f.id, name: f.name, type: f.type, file: f.file })),
+    () => store.getFiles().map((f) => ({ fileId: f.id, name: f.name, type: f.type, file: f.file })),
     [],
   );
 
@@ -437,7 +377,7 @@ export function useDocumentSession() {
     files,
     pages,
     totalPages: pages.length,
-    docsRef,
+    docs: store.docs,
     grouped,
     pageCountsByFile,
     asSources,

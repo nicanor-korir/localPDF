@@ -4,7 +4,7 @@ import { FileItem } from './file-item';
 
 /** The sources the user added, as opposed to the pages of the output. */
 export function SourceList({ session, children }) {
-  const { files, docsRef, grouped, pageCountsByFile, moveDocument, removeFile, clearAll } = session;
+  const { files, docs, grouped, pageCountsByFile, moveDocument, removeFile, clearAll } = session;
 
   return (
     <section className="file-section" aria-label="Source documents">
@@ -24,7 +24,7 @@ export function SourceList({ session, children }) {
             index={index}
             total={files.length}
             pageCount={pageCountsByFile.get(entry.id) ?? 0}
-            failed={docsRef.current.get(entry.id)?.failed}
+            failed={docs.get(entry.id)?.failed}
             canReorder={grouped}
             onMove={moveDocument}
             onRemove={removeFile}

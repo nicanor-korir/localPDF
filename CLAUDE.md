@@ -2,7 +2,14 @@
 
 ## Project Overview
 
-A local-first web application for merging PDFs and images into a single PDF document. All processing happens entirely client-side in the browser — no files are ever uploaded to a server. Privacy-focused by design.
+A local-first set of PDF tools — merge, organise, extract, split, with more on the roadmap. All
+processing happens entirely client-side in the browser; no file is ever uploaded to a server,
+and the CSP makes that a property of the app rather than a promise about it.
+
+`docs/ROADMAP.md` holds the phase plan and, importantly, **the engine decision and the evidence
+behind it** — why pdf-lib + pdf.js + our own crypto, and why not mupdf-wasm (AGPL), qpdf-wasm
+(megabytes) or pdf.js's `extractPages()` (produces unreadable output on encrypted input). Read
+it before proposing a different library.
 
 ## Tech Stack
 
@@ -16,29 +23,55 @@ A local-first web application for merging PDFs and images into a single PDF docu
 
 ```
 app/
-  layout.js        — Root layout: metadata, CSP <meta>, global styles
+  layout.js        — Root layout: metadata (title template), CSP <meta>, global styles
   globals.css      — All styles (CSS custom properties, responsive layout, a11y utilities)
-  page.js          — Simple wrapper that renders PdfMerger
-  pdf-merger.js    — Main client component: UI, state, lazy page rendering (no merge logic)
+  page.js          — Route: / (Merge)
+  merge-tool.js    — The merge tool
+  organise/        — Route: /organise (reorder, rotate, crop, delete)
+  extract/         — Route: /extract (pick pages -> a new PDF)
+  split/           — Route: /split (one PDF -> many, zipped)
+  _components/     — Shared UI. A leading _ keeps the folder out of the router.
+    tool-shell.js    — Header, brand, tool row, privacy badge; every tool sits in it
+    tool-nav.js      — The tool row, driven by lib/tools.js
+    drop-zone.js     — File intake (drag/drop + browse)
+    source-list.js   — The documents the user added
+    page-grid.js     — The preview: one card per output page
+    page-card.js     — One page + its controls + CropLayer (memoised; see below)
+    file-item.js     — One source row
+    privacy-badge.js — Reads the live CSP and explains it
+    feedback.js      — ProgressOverlay / Toast / LiveRegion
+  _lib/            — Browser-only helpers (anything DOM-free belongs in lib/)
+    use-document.js  — The document session: files, pages, rasters, undo, page ops
+    use-pdf-output.js— Running jobs and delivering the result (single PDF or zip)
+    use-selection.js — Which pages are ticked, keyed by page id
+    pdf-render.js    — loadPdfjs(), drawPage(), render constants
+    download.js      — Blob -> download, with the deferred revoke
 lib/
-  merge.js         — mergeDocuments(): the whole merge pipeline, DOM-free and unit-tested
-  run-merge.js     — Dispatcher: worker when the browser allows, main thread otherwise
-  merge-worker.js  — Worker entry; the merge runs here on almost every browser
+  tools.js         — The tool registry (plain data; drives the row, the routes and CI)
+  asset-path.js    — Root-relative URLs for the two workers. Read the comment before changing.
+  merge.js         — mergeDocuments(): the whole build pipeline, DOM-free and unit-tested
+  run-merge.js     — Dispatcher: runPdfJobs() (worker when allowed) + runMerge() wrapper
+  merge-worker.js  — Worker entry; runs a *list* of jobs, one per output document
+  page-selection.js— Range parsing ("1-3, 5, 9-end") and split planning
+  zip.js           — Store-only ZIP writer, no dependency
   image-transform.js— Shared image geometry, so the two encoders cannot drift
   compress-image-worker.js — OffscreenCanvas encoder used inside the worker
   pages.js         — The page model: reconcile, reorder, rotate, crop, remove (all pure)
   output-settings.js— Page sizes, image quality presets, download-name sanitising
-  pdf-geometry.js  — A4 fitting, annotation transforms, rotation/crop → content-space maths
+  pdf-geometry.js  — A4 fitting, annotation transforms, rotation/crop -> content-space maths
   file-types.js    — Validation, MIME resolution, download naming, id generation
-  compress-image.js— Browser-only canvas → baseline JPEG, applying rotation + crop
+  compress-image.js— Browser-only canvas -> baseline JPEG, applying rotation + crop
   *.test.js        — Vitest suites (run in Node)
   __fixtures__/    — Programmatic PDF builders + a 1x1 baseline JPEG
+docs/
+  ROADMAP.md       — Engine decision, evidence, and the phase plan
 .github/workflows/
-  ci.yml           — Tests, build, and a pdf.js worker drift check on every push/PR
+  ci.yml           — Tests, build, offline-bundle check, pdf.js worker drift check
 scripts/
   copy-pdf-worker.mjs — Copies pdf.js worker into public/ (postinstall + prebuild)
   build-worker.mjs    — Bundles the merge worker into public/merge-worker.js (pre-build)
   generate-sw.mjs     — Writes out/sw.js after the build, precaching the real file list
+  check-offline-bundle.mjs — Asserts the export can actually work offline
   generate-icons.mjs  — Rasterises the app icons + social card (only when the mark changes)
 public/
   pdf.worker.min.js   — pdf.js worker (generated; kept in sync with pdfjs-dist)
@@ -47,7 +80,7 @@ public/
   icon.svg            — Hand-written favicon, same geometry as the PNGs
   manifest.webmanifest — PWA manifest
 SECURITY.md        — Reporting policy and the guarantees/trade-offs behind the privacy claim
-next.config.mjs    — Next.js config (static export, webpack canvas alias)
+next.config.mjs    — Next.js config (static export)
 vercel.json        — Security headers + CSP for Vercel hosting
 CLAUDE.md          — Project documentation for AI assistants
 PROMPT.md          — Original requirements and feature requests
@@ -66,9 +99,39 @@ bun run start          # Serve production build locally
 bun run copy-pdf-worker # Manually re-copy the pdf.js worker (rarely needed)
 bun run test           # Run the Vitest suite once
 bun run test:watch     # Re-run tests on change
+bun run check:offline  # Assert the built export can actually work offline (also runs in CI)
 ```
 
 ## Architecture Notes
+
+### One app, many tools
+Each tool is its own route (`/`, `/organise`, `/extract`, `/split`), not a tab. A URL can be
+bookmarked, opened in a new tab and indexed; a tab state cannot. `lib/tools.js` is the single
+registry — plain data, no JSX — and it drives the tool row, the roadmap and a CI assertion that
+every registered tool actually has a shell in the export. Adding a tool means adding an entry
+*and* a route; CI fails if you add the first without the second.
+
+Tools that are on the roadmap but not built carry `status: 'planned'` and are deliberately not
+rendered. A row of controls that do nothing makes a finished product feel unfinished.
+
+**The tools are mostly the same app.** `useDocumentSession()` holds files, pages, rasters and
+undo; `usePdfOutput()` runs the jobs and delivers the result. Merge, organise, extract and split
+differ only in what they do with `pages[]` at the end — which is the whole reason the page model
+was worth building. Extract and split are `mergeDocuments` pointed at a subset, with
+`pageSize: 'original'` so a document that is only being rearranged is not silently refitted to
+A4.
+
+### Static assets are resolved from the app root, never `document.baseURI`
+`lib/asset-path.js` exists because of a real, silent bug. The merge worker used to be loaded as
+`new Worker(new URL('merge-worker.js', document.baseURI))`, which worked while `/` was the only
+route. On `/split` that resolves to `/split/merge-worker.js`, which 404s — and `runMerge()`
+treats a worker that will not start as a bundling problem and quietly finishes on the main
+thread. Every tool except the home page was freezing the tab on large documents, with nothing
+but a console warning to show for it.
+
+Both the merge worker and the pdf.js worker now go through `assetUrl()`. Hosting under a
+sub-path means setting Next's `basePath` and `NEXT_PUBLIC_BASE_PATH` to match — one knob, not
+two scattered string literals.
 
 ### Deploying (Vercel)
 `vercel.json` deploys `out/` directly (`framework: null` + an explicit `buildCommand` and
@@ -97,6 +160,17 @@ it as load-bearing:
   failure is silent. Note the registration is *not* simply bound to the `load` event: by the
   time React runs an effect that event has usually already fired, so `register-sw.js` checks
   `document.readyState` first. Binding to `load` alone silently disables offline support.
+- **Navigations are mapped to their shell by hand.** The export writes `/organise` as
+  `organise.html`, so a navigation request for the extension-less URL never matches the cache
+  by request even though the entry is right there. Without `navigate()` in the generated
+  worker, every tool route fell back to `index.html` offline and quietly served the *merge*
+  page at `/organise`. Nothing about that looks wrong in a build.
+- **The generator refuses to emit a worker that does not parse.** A syntax error in `sw.js`
+  means it never registers and offline support disappears silently; `generate-sw.mjs` now
+  parses the string before writing it. This caught a real escaping bug the same day it was
+  introduced.
+- `scripts/check-offline-bundle.mjs` (CI, and `bun run check:offline`) asserts every tool
+  shell, both workers and the manifest are in the precache list.
 - The worker only handles same-origin `GET`s for files that shipped with the build. User
   documents never traverse the network, so it never sees them.
 
@@ -208,9 +282,14 @@ the browser's own undo still works in the file-name box.
 - All file handling, preview generation, and PDF merging runs in the browser
 - Uses Web APIs: File API, Canvas API, Blob, URL.createObjectURL
 
-### The merge runs in a Web Worker
-`runMerge()` in `run-merge.js` is the only entry point the UI calls. It picks a path and
-returns the same shape either way: `{ promise, cancel }`.
+### The build runs in a Web Worker
+`runPdfJobs()` in `run-merge.js` is the entry point; `runMerge()` is a thin wrapper for the
+single-document case. It picks a path and returns the same shape either way:
+`{ promise, cancel }`.
+
+**A job is one output document.** Merge sends one, split sends one per part. Doing every part
+in a single worker trip is not a micro-optimisation: the sources are parsed once for the whole
+set, and a worker per part would also mean re-sending every source file to each of them.
 
 - **OffscreenCanvas is the gate, not `Worker`.** Image pages have to be re-encoded, and without
   OffscreenCanvas there is no canvas inside a worker to do it with. Safari only gained it in
@@ -396,6 +475,8 @@ It is the only trust-facing UI, and it adds no persistent chrome: the badge was 
 ### Layout States
 - **Empty state**: Centered drop zone, no preview panel
 - **With files**: Two-column layout — file list on left, combined preview on right
+- The tool row is always present, and scrolls horizontally rather than wrapping: a header that
+  changes height as tools are added would shift the page under the user.
 
 ### File Management
 - Drag-and-drop file upload
@@ -451,14 +532,24 @@ It is the only trust-facing UI, and it adds no persistent chrome: the badge was 
 ## Code Patterns
 
 ### State Management
+State lives in two hooks, not in the tool components, so every tool behaves the same way.
+
 ```javascript
-const [files, setFiles] = useState([]);        // File entries with metadata
-const [previews, setPreviews] = useState([]);   // Generated preview data
-const [merging, setMerging] = useState(false);  // Merge in progress
-const [progress, setProgress] = useState('');   // Progress message (in the overlay)
-const [toast, setToast] = useState(null);       // { message, isError } | null
-const [liveMessage, setLiveMessage] = useState(''); // sr-only live-region text
-const filesRef = useRef(files);                 // mirror of files for unmount cleanup
+// app/_lib/use-document.js — the document session
+const session = useDocumentSession();
+// { files, pages, totalPages, docsRef, grouped, pageCountsByFile, asSources,
+//   toast, liveMessage, showToast, announce,
+//   addFiles, removeFile, clearAll, getBitmap,
+//   mutate, undo, historyDepth, moveDocument, onRotate, onDeletePage, onMovePage,
+//   croppingId, onStartCrop, onCancelCrop, onApplyCrop,
+//   draggedId, dragTargetId, onDragStart, onDragOver, onDragLeave, onDragEnd, onItemDrop }
+
+// app/_lib/use-pdf-output.js — running jobs and delivering the result
+const output = usePdfOutput({ showToast });
+// { busy, progress, cancel, build, deliverSingle, deliverZip }
+
+// app/_lib/use-selection.js — extract only
+const selection = usePageSelection(pages);   // keyed by page id, survives reorder
 ```
 
 ### File Entry Structure
@@ -509,7 +600,7 @@ const filesRef = useRef(files);                 // mirror of files for unmount c
 ## Verifying
 
 ```bash
-bun run test    # 115 assertions over the merge pipeline, page model, settings and transforms
+bun run test    # 173 assertions over the pipeline, page model, ranges, zip, settings and transforms
 ```
 
 The suite builds real PDFs (linked, form-bearing, rotated, landscape, encrypted, page-less,
@@ -528,6 +619,24 @@ Then load `http://localhost:4555`, add a PDF + an image, confirm previews render
 merge downloads. Watch the console for **CSP violations** (e.g. "Refused to…") — zero is the
 expected result. A blank page with an empty `<title>` means the CSP blocked Next's inline
 bootstrap (`script-src` needs `'unsafe-inline'`).
+
+⚠️ **Unregister the service worker first, or you will test the previous build.** There is no
+`skipWaiting()` by design, so a tab that has visited the app before keeps being served the old
+cache and your change appears not to have worked. In the console:
+
+```js
+for (const r of await navigator.serviceWorker.getRegistrations()) await r.unregister();
+for (const k of await caches.keys()) await caches.delete(k);
+location.reload();
+```
+
+Also check the console for `PDF worker unavailable; falling back to the main thread`. That
+warning means the merge worker did not start — the app still works, just far more slowly, and
+nothing else surfaces it. See "Static assets are resolved from the app root" above.
+
+To verify offline behaviour honestly, load the app so the worker installs, then **stop the
+server** and navigate to `/organise` and `/split`. They must load their own pages, not the
+merge page.
 
 ## Important Constraints
 

@@ -1,6 +1,7 @@
 {
   "name": "merge-my-pdf-files-locally",
   "version": "1.0.0",
+  "type": "module",
   "description": "i can't trust some files on online tools, building a simple local solution",
   "private": true,
   "scripts": {
@@ -13,7 +14,8 @@
     "postinstall": "node scripts/copy-pdf-worker.mjs",
     "copy-pdf-worker": "node scripts/copy-pdf-worker.mjs",
     "generate-icons": "node scripts/generate-icons.mjs",
-    "build-worker": "node scripts/build-worker.mjs"
+    "build-worker": "node scripts/build-worker.mjs",
+    "check:offline": "node scripts/check-offline-bundle.mjs"
   },
   "dependencies": {
     "next": "^16.3.4",

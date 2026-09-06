@@ -1,5 +1,5 @@
-import PdfMerger from './pdf-merger';
+import MergeTool from './merge-tool';
 
 export default function Home() {
-  return <PdfMerger />;
+  return <MergeTool />;
 }

@@ -77,20 +77,49 @@ self.addEventListener('fetch', (event) => {
   const url = new URL(request.url);
   if (url.origin !== self.location.origin) return;
 
+  if (request.mode === 'navigate') {
+    event.respondWith(navigate(url));
+    return;
+  }
+
   // Every asset is either content-hashed or part of the shell, so the cache is authoritative.
-  // A navigation that misses falls back to the cached shell, which is what makes a hard
-  // refresh work offline.
-  event.respondWith(
-    caches.match(request).then((hit) => {
-      if (hit) return hit;
-      return fetch(request).catch(() => {
-        if (request.mode === 'navigate') return caches.match('./index.html');
-        throw new Error('offline and not cached');
-      });
-    }),
-  );
+  event.respondWith(caches.match(request).then((hit) => hit || fetch(request)));
 });
+
+// The static export writes /organise as organise.html, so a navigation to the extension-less
+// URL never matches the cache by request — the entry is there under a different key. Map the
+// path to the file that backs it before giving up.
+//
+// Without this every tool route fell back to index.html offline, which quietly served the
+// merge page at /organise, /split and /extract. Nothing about that looks wrong in a build.
+async function navigate(url) {
+  const scope = new URL(self.registration.scope).pathname;
+  let path = url.pathname.startsWith(scope) ? url.pathname.slice(scope.length) : url.pathname.slice(1);
+  path = path.replace(/[/]+$/, '');
+
+  const candidate = path === '' ? './index.html' : path.endsWith('.html') ? './' + path : './' + path + '.html';
+  const shell = await caches.match(candidate);
+  if (shell) return shell;
+
+  try {
+    return await fetch(url.href);
+  } catch {
+    // Offline and this route was never built. The app shell is still a better answer than a
+    // browser error page.
+    return (await caches.match('./index.html')) || Response.error();
+  }
+}
 `;
+
+// A service worker with a syntax error fails to register, silently taking offline support
+// with it — and nothing in the build output would say so. Parse it before writing it.
+try {
+  new Function(sw.replace(/\bself\b/g, 'globalThis'));
+} catch (err) {
+  console.error('generate-sw: refusing to write a service worker that does not parse.');
+  console.error(err.message);
+  process.exit(1);
+}
 
 writeFileSync(join(OUT, 'sw.js'), sw);
 console.log(`generate-sw: precaching ${assets.length} files (cache pdf-merger-${version})`);

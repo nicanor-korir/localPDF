@@ -6,7 +6,12 @@ const DESCRIPTION =
 
 export const metadata = {
   metadataBase: new URL(SITE),
-  title: 'PDF Merger — Local & Private',
+  // A template so each tool page names itself in the tab and in search results, while the
+  // home page keeps the title the site is already known by.
+  title: {
+    default: 'PDF Merger — Local & Private',
+    template: '%s — Local & Private',
+  },
   description: DESCRIPTION,
   applicationName: 'PDF Merger',
   manifest: '/manifest.webmanifest',

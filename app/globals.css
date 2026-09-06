@@ -571,6 +571,153 @@ body {
   background: var(--danger-bg);
 }
 
+/* --- The tool row --------------------------------------------------------
+   Real links, one URL per tool, so each is bookmarkable and findable. The row
+   scrolls horizontally rather than wrapping: a header that changes height as
+   tools are added would shift the whole page under the user. */
+
+.header-brand {
+  display: flex;
+  align-items: center;
+  border-radius: 10px;
+  flex-shrink: 0;
+}
+
+.header-titles {
+  min-width: 0;
+}
+
+.header-titles h1,
+.header-titles p {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.tool-nav {
+  max-width: 1360px;
+  margin: 12px auto 0;
+  overflow-x: auto;
+  /* The scrollbar would otherwise appear and disappear as tools are added, nudging
+     the content below it. */
+  scrollbar-width: none;
+}
+
+.tool-nav::-webkit-scrollbar {
+  display: none;
+}
+
+.tool-nav-list {
+  display: flex;
+  gap: 6px;
+  list-style: none;
+  min-width: max-content;
+}
+
+.tool-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 7px 13px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text-secondary);
+  font-size: 0.82rem;
+  font-weight: 600;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: color var(--transition), background var(--transition), border-color var(--transition);
+}
+
+.tool-chip:hover {
+  color: var(--text);
+  border-color: var(--border-hover);
+  background: var(--surface-raised);
+}
+
+.tool-chip-active,
+.tool-chip-active:hover {
+  color: var(--primary);
+  background: var(--primary-light);
+  border-color: var(--primary-light);
+}
+
+/* --- Tool panels ---------------------------------------------------------- */
+
+.range-form {
+  padding: 14px 16px 0;
+}
+
+.range-row {
+  display: flex;
+  gap: 8px;
+  align-items: stretch;
+}
+
+.range-row input {
+  flex: 1;
+  min-width: 0;
+}
+
+.field-help,
+.field-error {
+  font-size: 0.76rem;
+  margin: 6px 16px 0;
+  line-height: 1.45;
+}
+
+.field-help {
+  color: var(--text-tertiary);
+}
+
+.field-error {
+  color: var(--danger);
+}
+
+.range-form .field-help,
+.range-form .field-error {
+  margin-left: 0;
+  margin-right: 0;
+}
+
+.select-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  padding: 12px 16px 0;
+}
+
+.tool-note {
+  font-size: 0.76rem;
+  color: var(--text-tertiary);
+  padding: 0 16px 14px;
+}
+
+/* --- Page selection ------------------------------------------------------- */
+
+.page-select {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  cursor: pointer;
+}
+
+.page-select input {
+  width: 17px;
+  height: 17px;
+  accent-color: var(--primary);
+  cursor: pointer;
+  margin: 0;
+}
+
+.preview-page.selected {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 1px var(--primary);
+}
+
 /* Touch devices: enlarge tap targets to the 44px minimum. */
 @media (pointer: coarse) {
   .move-btn,

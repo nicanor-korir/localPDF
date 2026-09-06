@@ -1,6 +1,8 @@
 # PDF Merger
 
-A privacy-focused web app for merging PDFs and images into a single PDF document. All processing happens locally in your browser — your files never leave your device.
+A privacy-focused set of PDF tools. All processing happens locally in your browser — your
+files never leave your device, and the Content-Security-Policy blocks every outbound request
+so they physically cannot.
 
 ## Why?
 
@@ -8,6 +10,17 @@ I can't trust some files on online tools, so I built a simple local solution
 
 <img width="1460" height="1188" alt="Screenshot 2026-02-13 at 13 38 00" src="https://github.com/user-attachments/assets/5eb57cb6-e5b4-4524-810e-6713df24af14" />
 
+
+## Tools
+
+| Tool | What it does |
+| --- | --- |
+| **[Merge](https://merge-pdf.nicanor.xyz/)** | Combine PDFs and images into one document |
+| **[Organise](https://merge-pdf.nicanor.xyz/organise)** | Reorder, rotate, crop and delete pages, keeping each page's original size |
+| **[Extract](https://merge-pdf.nicanor.xyz/extract)** | Make a new PDF from the pages you pick |
+| **[Split](https://merge-pdf.nicanor.xyz/split)** | Break one PDF into several files — by range, every N pages, or one per page — downloaded as a zip |
+
+More are on the way; see [docs/ROADMAP.md](docs/ROADMAP.md) for what and in what order.
 
 ## Features
 
@@ -26,7 +39,9 @@ I can't trust some files on online tools, so I built a simple local solution
   silently lost
 - Resilient merge: a corrupt, password-protected, or unreadable file is skipped with a named
   reason, not fatal — the rest still merge
-- Output filename derived from the first file (e.g. `report.pdf` → `report-merged.pdf`)
+- Output filename derived from the first file and tagged with the tool that made it
+  (e.g. `report.pdf` → `report-merged.pdf`, `report-extracted.pdf`)
+- Page ranges written the way you would say them: `1-3, 5, 9-end`
 - Compressed output for smaller file sizes
 - Accessible: screen-reader announcements, keyboard reordering, visible focus, reduced-motion support
 - **Genuinely works offline** — a service worker precaches the whole app on your first visit,

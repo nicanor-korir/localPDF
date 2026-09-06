@@ -10,6 +10,22 @@ import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { READY_TOOLS } from '../lib/tools.js';
 
+// `framework: null` means Vercel serves out/ as raw files with no clean-URL resolution, so
+// /organise 404s unless vercel.json rewrites it to organise.html. It is a rewrite rather than
+// `cleanUrls: true` on purpose: cleanUrls answers /organise.html with a 308, and
+// `cache.put` rejects a redirected response — so the service worker's precache would fail to
+// install and offline support would vanish without a word.
+const vercel = JSON.parse(readFileSync('vercel.json', 'utf8'));
+const rewrites = new Map((vercel.rewrites || []).map((r) => [r.source, r.destination]));
+const needRewrite = READY_TOOLS.filter((tool) => tool.href !== '/');
+const badRewrites = needRewrite.filter((tool) => rewrites.get(tool.href) !== `${tool.href}.html`);
+if (badRewrites.length) {
+  throw new Error(
+    `vercel.json is missing a rewrite for: ${badRewrites.map((t) => t.href).join(', ')} — ` +
+      'those routes will 404 in production.',
+  );
+}
+
 const OUT = 'out';
 const sw = readFileSync(join(OUT, 'sw.js'), 'utf8');
 
@@ -49,5 +65,6 @@ if (!/async function navigate\(/.test(sw)) {
 JSON.parse(readFileSync(join(OUT, 'manifest.webmanifest'), 'utf8'));
 
 console.log(
-  `offline bundle ok: ${assets.length} assets precached, ${shells.length} tool shells (${shells.join(', ')})`,
+  `offline bundle ok: ${assets.length} assets precached, ${shells.length} tool shells ` +
+    `(${shells.join(', ')}), ${needRewrite.length} route rewrites`,
 );

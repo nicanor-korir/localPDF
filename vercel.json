@@ -3,6 +3,20 @@
   "framework": null,
   "buildCommand": "node scripts/build-worker.mjs && next build && node scripts/generate-sw.mjs",
   "outputDirectory": "out",
+  "rewrites": [
+    {
+      "source": "/organise",
+      "destination": "/organise.html"
+    },
+    {
+      "source": "/extract",
+      "destination": "/extract.html"
+    },
+    {
+      "source": "/split",
+      "destination": "/split.html"
+    }
+  ],
   "headers": [
     {
       "source": "/(.*)",

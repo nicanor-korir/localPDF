@@ -22,6 +22,7 @@ I can't trust some files on online tools, so I built a simple local solution
 | **[Unlock](https://merge-pdf.nicanor.xyz/unlock)** | Remove a password you know, or restrictions that need no password at all |
 | **[Protect](https://merge-pdf.nicanor.xyz/protect)** | Add an AES-256 password and restrict printing, copying or editing |
 | **[Convert](https://merge-pdf.nicanor.xyz/convert)** | Turn a PDF into PNG or JPEG images, plain text, Markdown or a Word document |
+| **[Compress](https://merge-pdf.nicanor.xyz/compress)** | Make a PDF smaller by re-encoding its images — never returns a bigger file |
 
 Your files carry over between tools — merge a few documents, switch to Organise to rearrange
 them, then Split the result, without loading anything twice. Nothing is written to disk on the

@@ -59,6 +59,9 @@ lib/
   pdf-lexer.js     — A targeted PDF reader. Not a parser; must not become one.
   text-layout.js   — pdf.js text items -> lines, paragraphs, headings; Markdown and text
   docx.js          — A Word document, built as OOXML over lib/zip.js
+  pdf-compress.js  — Re-encode the images; never returns a larger file
+  pdf-images.js    — Which images can be touched, and how to describe them afterwards
+  recode-image.js  — Shared decode/downsample/encode; -worker and -dom supply the canvas
   crypto/          — MD5, RC4, SHA-2, AES. Verified against node:crypto.
   page-selection.js— Range parsing ("1-3, 5, 9-end") and split planning
   zip.js           — Store-only ZIP writer, no dependency
@@ -581,6 +584,32 @@ throttling there is the right default.
 **No OCR.** A scanned page has no text layer, so text conversion of one produces nothing; the
 tool detects that and says to convert to images instead, rather than downloading an empty file.
 
+### Compress
+Almost all of it happens in the images. In any document worth compressing, one scanned page
+outweighs the entire object graph, so this re-encodes the large images and leaves everything
+else alone. Subsetting fonts or discarding structure would risk the document for savings that
+round to nothing.
+
+Two rules it must not break:
+
+- **Never return a larger file.** Re-encoding an already-optimised image usually makes it
+  bigger, and a Compress button that quietly inflates a document is worse than one that does
+  nothing. If the result is not smaller, the original comes back and the page says so.
+- **Skip what cannot be read safely.** Fax, JBIG2, JPEG 2000, indexed and CMYK images are left
+  exactly as they were. Half of them are already smaller than any re-encoding would manage, and
+  guessing at the rest is how a document ends up with a blank page in it.
+
+Small images are left alone on purpose (`shouldRecode`): re-encoding a logo saves nothing and
+softens something that was crisp. All the savings come from the handful of large scans.
+
+`analysePdf()` runs first and says where the bytes are, because that is the honest answer to
+"how much smaller can this get" — a document that is 4% images has nothing to give, and saying
+so beats a progress bar that ends in a 2% saving.
+
+The byte-level pass writes every object at the top level with a plain cross-reference table,
+which is easy to be sure is correct but larger than the object streams most producers use;
+handing the result to pdf-lib at the end puts that structure back.
+
 ### Protect and Unlock
 Two rules the UI must keep telling the truth about:
 
@@ -723,7 +752,7 @@ const selection = usePageSelection(pages);   // keyed by page id, survives reord
 ## Verifying
 
 ```bash
-bun run test    # 292 assertions over the pipeline, page model, ranges, zip, settings and transforms
+bun run test    # 336 assertions over the pipeline, page model, ranges, zip, settings and transforms
 ```
 
 The suite builds real PDFs (linked, form-bearing, rotated, landscape, encrypted, page-less,

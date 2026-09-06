@@ -27,6 +27,10 @@
     {
       "source": "/convert",
       "destination": "/convert.html"
+    },
+    {
+      "source": "/compress",
+      "destination": "/compress.html"
     }
   ],
   "headers": [

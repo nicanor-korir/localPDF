@@ -2,7 +2,7 @@
 
 import { useCallback, useRef, useState } from 'react';
 import { describeSkipped } from '../../lib/describe-skipped';
-import { MergeCancelled, runPdfJobs } from '../../lib/run-merge';
+import { MergeCancelled, runPdfJobs } from '../../lib/run-pdf';
 import { downloadBytes } from './download';
 
 /**

@@ -80,7 +80,7 @@ Ordered so value lands early and the two features where "looks right but is
 silently wrong" is dangerous (crypto, redaction) get built when there is time to
 do them properly.
 
-### Phase 1 — Workspace shell + page tools
+### Phase 1 — Workspace shell + page tools — **DONE**
 The app stops being one page and becomes a tool hub: a shared document session,
 one preview surface, one route per tool (deep‑linkable, individually precached).
 - Organise / Reorder / Rotate / Delete — surface the existing model
@@ -89,7 +89,7 @@ one preview surface, one route per tool (deep‑linkable, individually precached
 - **Crop** — existing crop UI, applied without a merge
 - New: `lib/zip.js` (store‑only zip writer, no dependency)
 
-### Phase 2 — Protect / Unprotect
+### Phase 2 — Protect / Unprotect — **DONE**
 - `lib/crypto/*` — MD5, RC4, AES‑CBC, SHA‑2
 - `lib/pdf-security.js` — standard security handler, R2–R6 key derivation
 - `lib/pdf-decrypt.js` — the raw pre‑pass described above
@@ -100,7 +100,13 @@ one preview surface, one route per tool (deep‑linkable, individually precached
   password *that the user supplies*. It is not a password cracker and will not
   become one.
 
-### Phase 3 — Convert + Compress
+Shipped as `/unlock` and `/protect`. Reads RC4‑40, RC4‑128, AES‑128 and AES‑256;
+writes AES‑256 only. Both run in the PDF worker — an 8 MB document takes about
+2.6s, which on the main thread would be a frozen tab. Object streams expand in
+both directions, so output is slightly larger than input; that is the trade for
+a plain cross‑reference table that is easy to be sure is correct.
+
+### Phase 3 — Convert + Compress — next
 - **To images** — PNG/JPEG per page → zip
 - **To text / Markdown** — pdf.js text content plus layout heuristics
 - **To Word (.docx)** — generated OOXML; honest about being flowed text, not

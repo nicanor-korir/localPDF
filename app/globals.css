@@ -695,6 +695,80 @@ body {
   padding: 0 16px 14px;
 }
 
+/* --- Single-document tool panels (unlock, protect) ------------------------- */
+
+.tool-panel {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-sm);
+  margin-top: 16px;
+  padding: 16px 16px 4px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.tool-panel-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  min-width: 0;
+}
+
+.tool-panel-head h2 {
+  font-size: 0.95rem;
+  font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* The panel lays its own children out, so the shared field spacing would double up. */
+.tool-panel .setting,
+.tool-panel .field-help,
+.tool-panel .field-error,
+.tool-panel .merge-bar,
+.tool-panel .tool-note {
+  margin: 0;
+  padding: 0;
+}
+
+.tool-panel .merge-bar {
+  border-top: 1px solid var(--border);
+  padding-top: 14px;
+}
+
+.tool-panel .btn-merge {
+  width: 100%;
+}
+
+.restrictions {
+  border: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.checkbox-row {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  font-size: 0.85rem;
+  color: var(--text);
+  cursor: pointer;
+}
+
+.checkbox-row input {
+  width: 17px;
+  height: 17px;
+  accent-color: var(--primary);
+  cursor: pointer;
+  margin: 0;
+  flex-shrink: 0;
+}
+
 /* --- Page selection ------------------------------------------------------- */
 
 .page-select {

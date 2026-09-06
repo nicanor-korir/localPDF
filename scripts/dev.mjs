@@ -1,7 +1,7 @@
-// Development entry point: rebuild the merge worker on change, then run `next dev`.
+// Development entry point: rebuild the PDF worker on change, then run `next dev`.
 //
-// Next's dev server knows nothing about public/merge-worker.js — it is built by us, not
-// bundled by Next — so without this watcher an edit to lib/merge-worker.js (or anything it
+// Next's dev server knows nothing about public/pdf-worker.js — it is built by us, not
+// bundled by Next — so without this watcher an edit to lib/pdf-worker.js (or anything it
 // imports, which is most of lib/) would be silently ignored until the next full build. That
 // is a bad way to find out your change did nothing.
 
@@ -18,7 +18,7 @@ const ctx = await context({
       setup(build) {
         build.onEnd((result) => {
           if (result.errors.length) return; // esbuild already printed them
-          console.log('[dev] merge worker rebuilt');
+          console.log('[dev] pdf worker rebuilt');
         });
       },
     },
@@ -26,7 +26,7 @@ const ctx = await context({
 });
 
 await ctx.watch();
-console.log('[dev] watching lib/merge-worker.js and its imports');
+console.log('[dev] watching lib/pdf-worker.js and its imports');
 
 const next = spawn(join(ROOT, 'node_modules/.bin/next'), ['dev'], { stdio: 'inherit' });
 

@@ -15,6 +15,14 @@
     {
       "source": "/split",
       "destination": "/split.html"
+    },
+    {
+      "source": "/unlock",
+      "destination": "/unlock.html"
+    },
+    {
+      "source": "/protect",
+      "destination": "/protect.html"
     }
   ],
   "headers": [

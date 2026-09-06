@@ -19,6 +19,8 @@ I can't trust some files on online tools, so I built a simple local solution
 | **[Organise](https://merge-pdf.nicanor.xyz/organise)** | Reorder, rotate, crop and delete pages, keeping each page's original size |
 | **[Extract](https://merge-pdf.nicanor.xyz/extract)** | Make a new PDF from the pages you pick |
 | **[Split](https://merge-pdf.nicanor.xyz/split)** | Break one PDF into several files — by range, every N pages, or one per page — downloaded as a zip |
+| **[Unlock](https://merge-pdf.nicanor.xyz/unlock)** | Remove a password you know, or restrictions that need no password at all |
+| **[Protect](https://merge-pdf.nicanor.xyz/protect)** | Add an AES-256 password and restrict printing, copying or editing |
 
 Your files carry over between tools — merge a few documents, switch to Organise to rearrange
 them, then Split the result, without loading anything twice. Nothing is written to disk on the
@@ -48,6 +50,9 @@ More are on the way; see [docs/ROADMAP.md](docs/ROADMAP.md) for what and in what
 - Page ranges written the way you would say them: `1-3, 5, 9-end`
 - Compressed output for smaller file sizes
 - Accessible: screen-reader announcements, keyboard reordering, visible focus, reduced-motion support
+- **Real AES-256 encryption**, computed on your device. Unlock reads RC4-40 through AES-256, so
+  it opens documents protected years ago; Protect only ever writes AES-256, because a button
+  that applies broken crypto is worse than no button
 - **Genuinely works offline** — a service worker precaches the whole app on your first visit,
   so it keeps working with no connection. Installable as a PWA.
 

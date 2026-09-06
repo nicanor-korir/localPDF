@@ -40,9 +40,9 @@ const shells = READY_TOOLS.map((tool) => (tool.href === '/' ? './index.html' : `
 const required = [
   ...shells,
   './pdf.worker.min.js',
-  // The merge worker is built by esbuild, not by Next, so nothing else in the pipeline would
+  // The PDF worker is built by esbuild, not by Next, so nothing else in the pipeline would
   // notice if it stopped being emitted.
-  './merge-worker.js',
+  './pdf-worker.js',
   './manifest.webmanifest',
 ];
 

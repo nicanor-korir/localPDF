@@ -10,7 +10,13 @@ import { ACCEPTED } from '../../lib/file-types';
  * wrapper is deliberately not itself a `role="button"` — that would nest interactive controls
  * and give assistive technology two entry points where there is really one.
  */
-export function DropZone({ onFiles, multiple = true, label, hint = 'PDF, PNG, JPG, JPEG, WebP' }) {
+export function DropZone({
+  onFiles,
+  multiple = true,
+  label,
+  accept = ACCEPTED,
+  hint = 'PDF, PNG, JPG, JPEG, WebP',
+}) {
   const inputRef = useRef(null);
   const [dragOver, setDragOver] = useState(false);
 
@@ -53,7 +59,7 @@ export function DropZone({ onFiles, multiple = true, label, hint = 'PDF, PNG, JP
         ref={inputRef}
         type="file"
         multiple={multiple}
-        accept={ACCEPTED}
+        accept={accept}
         style={{ display: 'none' }}
         onChange={(e) => {
           onFiles(e.target.files);

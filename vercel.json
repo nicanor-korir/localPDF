@@ -23,6 +23,10 @@
     {
       "source": "/protect",
       "destination": "/protect.html"
+    },
+    {
+      "source": "/convert",
+      "destination": "/convert.html"
     }
   ],
   "headers": [

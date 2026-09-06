@@ -45,6 +45,7 @@ app/
     use-pdf-output.js— Running jobs and delivering the result (single PDF or zip)
     use-selection.js — Which pages are ticked, keyed by page id
     pdf-render.js    — loadPdfjs(), drawPage(), render constants
+    convert.js       — Page -> image at export resolution, and text extraction
     download.js      — Blob -> download, with the deferred revoke
 lib/
   tools.js         — The tool registry (plain data; drives the row, the routes and CI)
@@ -56,6 +57,8 @@ lib/
   pdf-decrypt.js   — Remove protection; pdf-encrypt.js adds it (AES-256 only)
   pdf-rewrite.js   — Byte-level rewriting shared by both directions
   pdf-lexer.js     — A targeted PDF reader. Not a parser; must not become one.
+  text-layout.js   — pdf.js text items -> lines, paragraphs, headings; Markdown and text
+  docx.js          — A Word document, built as OOXML over lib/zip.js
   crypto/          — MD5, RC4, SHA-2, AES. Verified against node:crypto.
   page-selection.js— Range parsing ("1-3, 5, 9-end") and split planning
   zip.js           — Store-only ZIP writer, no dependency
@@ -546,6 +549,38 @@ is enforced and how to check it. Two rules for it:
 
 It is the only trust-facing UI, and it adds no persistent chrome: the badge was already there.
 
+### Convert
+Five formats, and they split cleanly in two.
+
+**Images** are the faithful path: each page is rendered at the chosen resolution with its
+rotation and crop applied, so the output matches the preview exactly. Deliberately *not* the
+preview raster cache — those are rendered at 1.4x for the screen, and exporting them would hand
+someone a soft upscale while calling it 300 dpi.
+
+**Text, Markdown and Word** are the lossy path, and the page says so. `lib/text-layout.js` is
+pure heuristics over geometry: a PDF has no paragraphs, only glyphs at coordinates. Lines are
+runs at a similar baseline, a paragraph break is a gap wider than the page's own rhythm, and a
+heading is type noticeably larger than the body around it.
+
+⚠️ **The page rhythm needs at least three gaps to mean anything.** On a sparse page — a heading
+and one line under it — the median gap *is* the paragraph break, so comparing it against itself
+means nothing on that page can ever be one. Below three gaps it falls back to ordinary leading
+(1.35x the type size). Every synthetic test passed while this was wrong, because the geometry
+the tests assumed was not the geometry the fixture has; there is now a test that runs a real PDF
+through pdf.js and the whole pipeline.
+
+⚠️ **`withTimerDrivenFrames()` in `app/_lib/convert.js` is load-bearing.** pdf.js steps a
+display render through `requestAnimationFrame`, and browsers suspend that in a hidden tab. Start
+a long export, switch tabs to do something else — exactly what people do while waiting — and the
+conversion silently stops with the progress overlay frozen mid-count. Swapping the scheduler for
+timers keeps the rendering *intent* identical to the preview, so the output still matches what
+was shown. (`intent: 'print'` would also dodge rAF, but it renders annotations differently.)
+Previews deliberately keep the normal behaviour: nobody is looking at them in a hidden tab, and
+throttling there is the right default.
+
+**No OCR.** A scanned page has no text layer, so text conversion of one produces nothing; the
+tool detects that and says to convert to images instead, rather than downloading an empty file.
+
 ### Protect and Unlock
 Two rules the UI must keep telling the truth about:
 
@@ -688,7 +723,7 @@ const selection = usePageSelection(pages);   // keyed by page id, survives reord
 ## Verifying
 
 ```bash
-bun run test    # 257 assertions over the pipeline, page model, ranges, zip, settings and transforms
+bun run test    # 292 assertions over the pipeline, page model, ranges, zip, settings and transforms
 ```
 
 The suite builds real PDFs (linked, form-bearing, rotated, landscape, encrypted, page-less,

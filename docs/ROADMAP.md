@@ -106,13 +106,18 @@ writes AES‑256 only. Both run in the PDF worker — an 8 MB document takes abo
 both directions, so output is slightly larger than input; that is the trade for
 a plain cross‑reference table that is easy to be sure is correct.
 
-### Phase 3 — Convert + Compress — next
+### Phase 3 — Convert (**done**) + Compress (next)
 - **To images** — PNG/JPEG per page → zip
 - **To text / Markdown** — pdf.js text content plus layout heuristics
 - **To Word (.docx)** — generated OOXML; honest about being flowed text, not
   pixel-faithful layout
 - **Compress** — downsample embedded images, re‑encode, object streams, dedupe
-  identical objects; show real before/after bytes
+  identical objects; show real before/after bytes. **Still to do.**
+
+Convert shipped as `/convert`: PNG and JPEG at 96/150/300 dpi, plus plain text,
+Markdown and Word. Images are faithful — each page rendered at the chosen
+resolution with its rotation and crop. Text is heuristic and the page says so;
+there is no OCR, so a scan converts to images or not at all.
 
 ### Phase 4 — Edit
 Add text, images and blank pages; move and resize what you added. pdf-lib can do

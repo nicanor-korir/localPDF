@@ -27,13 +27,13 @@ export async function loadPdfjs() {
 }
 
 /**
- * Draw a page's cached raster with its rotation and crop applied.
+ * Draw a page's raster with its rotation and crop applied, scaled to `targetWidth`.
  *
  * Deliberately the same order as compressImage(): rotate, then crop the rotated result. The
  * preview is what the user cropped against, so any divergence here would surface as an output
  * that does not match what they saw.
  */
-export function drawPage(canvas, bitmap, rotation, crop) {
+export function drawPage(canvas, bitmap, rotation, crop, targetWidth = CANVAS_WIDTH) {
   const quarter = rotation === 90 || rotation === 270;
   const rotW = quarter ? bitmap.height : bitmap.width;
   const rotH = quarter ? bitmap.width : bitmap.height;
@@ -44,7 +44,10 @@ export function drawPage(canvas, bitmap, rotation, crop) {
   const ch = crop ? crop.height * rotH : rotH;
   if (cw <= 0 || ch <= 0) return;
 
-  const scale = CANVAS_WIDTH / cw;
+  // A null target means "whatever the source is", which is what an export wants: the page is
+  // already rendered at the resolution the caller asked for, and rescaling it here would
+  // either soften it or waste the pixels.
+  const scale = targetWidth === null ? 1 : targetWidth / cw;
   canvas.width = Math.max(1, Math.round(cw * scale));
   canvas.height = Math.max(1, Math.round(ch * scale));
 

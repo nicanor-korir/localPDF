@@ -11,6 +11,7 @@ import {
 import {
   arePagesGroupedByFile,
   cropPage,
+  isBlank,
   moveFileBlock,
   movePage,
   reconcilePages,
@@ -144,10 +145,24 @@ export function useDocumentSession() {
     const key = renderKey(page);
     if (store.rasters.has(key)) return store.rasters.get(key);
 
+    let bitmap;
+    if (isBlank(page)) {
+      // A4 proportions, because that is what a blank page comes out as unless the page before
+      // it says otherwise — and one white raster serves every blank page in the document.
+      const canvas = document.createElement('canvas');
+      canvas.width = 595;
+      canvas.height = 842;
+      const context = canvas.getContext('2d');
+      context.fillStyle = '#ffffff';
+      context.fillRect(0, 0, canvas.width, canvas.height);
+      bitmap = await createImageBitmap(canvas);
+      store.rasters.set(key, bitmap);
+      return bitmap;
+    }
+
     const source = store.getFiles().find((f) => f.id === page.fileId);
     if (!source) throw new Error('Source file is no longer available');
 
-    let bitmap;
     if (source.type === 'application/pdf') {
       const pdf = store.docs.get(page.fileId)?.pdf;
       if (!pdf) throw new Error('Document is not open');

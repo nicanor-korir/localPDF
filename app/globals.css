@@ -870,6 +870,36 @@ body {
   }
 }
 
+/* --- "A newer version is ready" ------------------------------------------- */
+
+.update-banner {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  justify-content: center;
+  padding: 8px 16px;
+  background: var(--primary-light);
+  color: var(--primary);
+  font-size: 0.82rem;
+  font-weight: 600;
+  border-bottom: 1px solid var(--border);
+}
+
+.update-banner .btn {
+  color: var(--primary);
+}
+
+.update-dismiss {
+  background: none;
+  border: 0;
+  color: inherit;
+  font-size: 1.1rem;
+  line-height: 1;
+  cursor: pointer;
+  padding: 2px 6px;
+  border-radius: var(--radius-xs);
+}
+
 /* --- Redaction ------------------------------------------------------------ */
 
 .redact-layer {

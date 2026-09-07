@@ -239,6 +239,16 @@ it as load-bearing:
 - **No `skipWaiting()`.** A new worker takes over only once every tab using the old one has
   closed. The app dynamically imports pdf.js; activating early and dropping the old cache could
   404 a chunk out from under a running page.
+- **A waiting version is announced, and switching to it needs more than a reload.** With no
+  `skipWaiting()`, a returning visitor keeps the old build until every tab for the site closes
+  — long enough to matter now that tools ship regularly. `ToolShell` shows one dismissible line
+  when an update is genuinely waiting.
+  ⚠️ **A plain `location.reload()` does nothing**: the waiting worker only takes over once no
+  client is controlled by the old one, and reloading hands the new page straight back to the
+  old worker. Measured — the button did nothing at all before `applyUpdate()`, which asks the
+  waiting worker to `skipWaiting()` and reloads on `controllerchange`. That is the safe case
+  for skipWaiting: the user asked, and the page reloads immediately, so there is no running
+  page left to break. Doing it automatically on install would still be wrong.
 - **Registration is best-effort.** Service workers need a secure context, and this app is meant
   to run from `file://` and plain-http LAN too, where `navigator.serviceWorker` is absent. Every
   failure is silent. Note the registration is *not* simply bound to the `load` event: by the
@@ -320,6 +330,19 @@ the user applied. Everything else follows from that:
 - Pages from different documents can interleave freely; the output is exactly the page order.
 - `files[]` still exists, but only as the list of *sources* — what the user added, not what
   the output looks like.
+
+**A blank page is the one entry with no source behind it** — `{ id, blank: true, ... }`. It
+says so in the type rather than being inferred from a missing `fileId`, because every other
+part of the model asks "which file is this from" and the honest answer here is "none". It
+takes its size from the page before it, so inserting one into a document of Letter pages gives
+another Letter page rather than a stray A4 one. Two consequences worth knowing:
+
+- **It disables moving a whole document.** A blank page belongs to no document, so there is no
+  unambiguous place for it to go when one moves past it — the arrows disable, the same answer
+  hand-interleaved pages already get.
+- **It goes when the last document goes.** Blanks survive removing *one* file among several,
+  but orphan blanks in an empty document would be invisible (the preview panel hides) and then
+  reappear unexplained on the next file added. Found by running it.
 
 `reconcilePages()` keeps the two in step: pages of a removed file drop out, a new file appends
 its pages, and everything else keeps its position and transforms. `seenFileIds` is what stops
@@ -812,7 +835,7 @@ const selection = usePageSelection(pages);   // keyed by page id, survives reord
 ## Verifying
 
 ```bash
-bun run test    # 387 assertions over the pipeline, page model, ranges, zip, settings and transforms
+bun run test    # 402 assertions over the pipeline, page model, ranges, zip, settings and transforms
 ```
 
 The suite builds real PDFs (linked, form-bearing, rotated, landscape, encrypted, page-less,

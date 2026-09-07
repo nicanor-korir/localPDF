@@ -16,7 +16,7 @@ I can't trust some files on online tools, so I built a simple local solution
 | Tool | What it does |
 | --- | --- |
 | **[Merge](https://merge-pdf.nicanor.xyz/)** | Combine PDFs and images into one document |
-| **[Organise](https://merge-pdf.nicanor.xyz/organise)** | Reorder, rotate, crop and delete pages, keeping each page's original size |
+| **[Organise](https://merge-pdf.nicanor.xyz/organise)** | Reorder, rotate, crop and delete pages, or add a blank one, keeping each page's original size |
 | **[Extract](https://merge-pdf.nicanor.xyz/extract)** | Make a new PDF from the pages you pick |
 | **[Split](https://merge-pdf.nicanor.xyz/split)** | Break one PDF into several files — by range, every N pages, or one per page — downloaded as a zip |
 | **[Unlock](https://merge-pdf.nicanor.xyz/unlock)** | Remove a password you know, or restrictions that need no password at all |

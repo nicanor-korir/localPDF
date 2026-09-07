@@ -119,7 +119,7 @@ export const RedactPage = memo(function RedactPage({
               ref={canvasRef}
               className="preview-canvas"
               role="img"
-              aria-label={`${label} of ${source?.name ?? 'the document'}`}
+              aria-label={page.blank ? `${label}, blank` : `${label} of ${source?.name ?? 'the document'}`}
             />
             {!bitmap && (
               <div className="preview-loading">

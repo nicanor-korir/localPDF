@@ -3,6 +3,7 @@
 import { useCallback } from 'react';
 import { buildDownloadName } from '../../lib/file-types';
 import { sanitizeDownloadName } from '../../lib/output-settings';
+import { insertBlankPage } from '../../lib/pages';
 import { DropZone } from '../_components/drop-zone';
 import { LiveRegion, ProgressOverlay, Toast } from '../_components/feedback';
 import { PageGrid } from '../_components/page-grid';
@@ -23,6 +24,12 @@ export default function OrganiseTool() {
   const session = useDocumentSession();
   const { files, pages, totalPages, showToast, addFiles, onCancelCrop } = session;
   const output = usePdfOutput({ showToast });
+
+  // Appended rather than inserted at a chosen point: the pages already drag into place, and a
+  // per-page "insert here" button would put two more controls under every card in the app.
+  const addBlank = useCallback(() => {
+    session.mutate((prev) => insertBlankPage(prev, prev.length - 1), 'Added a blank page');
+  }, [session]);
 
   const save = useCallback(() => {
     if (pages.length === 0) return;
@@ -71,7 +78,11 @@ export default function OrganiseTool() {
         </div>
 
         {files.length > 0 && (
-          <PageGrid session={session} hint="Drag a page to reorder, or use the buttons on each page" />
+          <PageGrid session={session} hint="Drag a page to reorder, or use the buttons on each page">
+            <button type="button" className="btn btn-ghost btn-sm" onClick={addBlank}>
+              Add blank page
+            </button>
+          </PageGrid>
         )}
 
         {output.busy && <ProgressOverlay message={output.progress} onCancel={output.cancel} />}

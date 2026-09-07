@@ -44,7 +44,11 @@ export const PageCard = memo(function PageCard({
   const [draft, setDraft] = useState(null);
 
   const label = `Page ${index + 1}`;
-  const sourceLabel = source ? `${source.name} (p.${page.sourceIndex + 1})` : 'Unknown source';
+  const sourceLabel = page.blank
+    ? 'Blank page'
+    : source
+      ? `${source.name} (p.${page.sourceIndex + 1})`
+      : 'Unknown source';
 
   // Render only once the page is near the viewport: a 400-page document should not rasterise
   // 400 pages before the user has scrolled.
@@ -110,7 +114,7 @@ export const PageCard = memo(function PageCard({
           <div className="preview-error">Could not render this page</div>
         ) : (
           <>
-            <canvas ref={canvasRef} className="preview-canvas" role="img" aria-label={`${label} of ${sourceLabel}`} />
+            <canvas ref={canvasRef} className="preview-canvas" role="img" aria-label={page.blank ? `${label}, blank` : `${label} of ${sourceLabel}`} />
             {!bitmap && (
               <div className="preview-loading">
                 <div className="spinner-sm" aria-hidden="true" />

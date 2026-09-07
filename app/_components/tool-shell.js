@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { registerServiceWorker } from '../../lib/register-sw';
 import { PrivacyBadge } from './privacy-badge';
 import { ToolNav } from './tool-nav';
@@ -14,7 +14,12 @@ import { ToolNav } from './tool-nav';
  * screen reader use to say what this page is — "PDF Tools" would tell neither of them anything.
  */
 export function ToolShell({ title, tagline, actions, children }) {
-  useEffect(registerServiceWorker, []);
+  // Held in an object because the value *is* a function, and a bare setState would treat it
+  // as an updater and call it immediately.
+  const [update, setUpdate] = useState(null);
+  const [dismissed, setDismissed] = useState(false);
+
+  useEffect(() => registerServiceWorker((apply) => setUpdate({ apply })), []);
 
   return (
     <>
@@ -41,6 +46,30 @@ export function ToolShell({ title, tagline, actions, children }) {
         </div>
         <ToolNav />
       </header>
+
+      {/*
+        The worker deliberately has no skipWaiting(): the app imports pdf.js on demand, and
+        activating a new version early could 404 a chunk out from under a page that is still
+        running. The cost is that a returning visitor keeps the old build until every tab for
+        the site has closed — which, with tools shipping regularly, is long enough to be worth
+        one line. Dismissible, and it only ever appears when an update is genuinely waiting.
+      */}
+      {update && !dismissed && (
+        <div className="update-banner" role="status">
+          <span>A newer version of these tools is ready.</span>
+          <button type="button" className="btn btn-ghost btn-sm" onClick={update.apply}>
+            Reload
+          </button>
+          <button
+            type="button"
+            className="update-dismiss"
+            aria-label="Dismiss the update notice"
+            onClick={() => setDismissed(true)}
+          >
+            &times;
+          </button>
+        </div>
+      )}
       {children}
     </>
   );

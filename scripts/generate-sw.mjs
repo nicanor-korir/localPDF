@@ -61,6 +61,16 @@ self.addEventListener('install', (event) => {
   event.waitUntil(caches.open(CACHE).then((cache) => cache.addAll(ASSETS)));
 });
 
+// The one and only way this worker activates early.
+//
+// skipWaiting() is deliberately NOT called on install: the app imports pdf.js on demand, and
+// activating a new version under a running page could 404 a chunk out from under it. Doing it
+// because someone pressed "Reload" is the opposite case — they asked, and the page reloads
+// immediately afterwards, so there is no running page left to break.
+self.addEventListener('message', (event) => {
+  if (event.data && event.data.type === 'skip-waiting') self.skipWaiting();
+});
+
 self.addEventListener('activate', (event) => {
   event.waitUntil(
     caches

@@ -76,7 +76,7 @@ const yieldToBrowser = () => new Promise((resolve) => setTimeout(resolve, 0));
  * aborted, and leaving it pointing at the real implementation would let a cancelled render keep
  * stepping. Both are restored in a `finally`, always.
  */
-async function withTimerDrivenFrames(work) {
+export async function withTimerDrivenFrames(work) {
   const frame = window.requestAnimationFrame;
   const cancel = window.cancelAnimationFrame;
   window.requestAnimationFrame = (callback) =>
@@ -100,7 +100,7 @@ function checkCancelled(signal) {
  * Deliberately not the preview cache: those are rendered at 1.4x for the screen, and exporting
  * them would hand the user a soft, upscaled image while telling them it was 300 dpi.
  */
-async function rasterisePage(page, source, pdf, scale) {
+export async function rasterisePage(page, source, pdf, scale) {
   if (source.type !== "application/pdf") return createImageBitmap(source.file);
 
   const pdfPage = await pdf.getPage(page.sourceIndex + 1);

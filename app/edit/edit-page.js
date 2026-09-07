@@ -1,7 +1,8 @@
 'use client';
 
-import { memo, useCallback, useEffect, useRef, useState } from 'react';
-import { PREVIEW_SCALE, drawPage } from '../_lib/pdf-render';
+import { memo, useCallback, useRef, useState } from 'react';
+import { PREVIEW_SCALE } from '../_lib/pdf-render';
+import { fractionOf, usePageRaster } from '../_lib/use-page-raster';
 
 const EMPTY = [];
 
@@ -17,17 +18,6 @@ function pageHeightInPoints(bitmap, rotation, crop) {
   const rotH = quarter ? bitmap.width : bitmap.height;
   const cropped = crop ? crop.height * rotH : rotH;
   return Math.max(1, cropped / PREVIEW_SCALE);
-}
-
-/** Where a pointer is within an element, as 0..1 fractions. */
-function fractionOf(element, event) {
-  const rect = element.getBoundingClientRect();
-  return {
-    x: (event.clientX - rect.left) / rect.width,
-    y: (event.clientY - rect.top) / rect.height,
-    width: rect.width,
-    height: rect.height,
-  };
 }
 
 /**
@@ -51,52 +41,10 @@ export const EditPage = memo(function EditPage({
   onAddImage,
   canAddImage,
 }) {
-  const hostRef = useRef(null);
-  const canvasRef = useRef(null);
+  const { hostRef, canvasRef, bitmap, failed } = usePageRaster(page, getBitmap);
   const layerRef = useRef(null);
-  const [bitmap, setBitmap] = useState(null);
-  const [visible, setVisible] = useState(false);
-  const [failed, setFailed] = useState(false);
   const [draft, setDraft] = useState(null);
   const dragRef = useRef(null);
-
-  useEffect(() => {
-    if (visible) return undefined;
-    const el = hostRef.current;
-    if (!el) return undefined;
-    if (typeof IntersectionObserver === 'undefined') {
-      setVisible(true);
-      return undefined;
-    }
-    const observer = new IntersectionObserver(
-      (entries) => {
-        if (entries.some((e) => e.isIntersecting)) setVisible(true);
-      },
-      { rootMargin: '600px 0px' },
-    );
-    observer.observe(el);
-    return () => observer.disconnect();
-  }, [visible]);
-
-  useEffect(() => {
-    if (!visible) return undefined;
-    let cancelled = false;
-    getBitmap(page)
-      .then((result) => {
-        if (!cancelled) setBitmap(result);
-      })
-      .catch(() => {
-        if (!cancelled) setFailed(true);
-      });
-    return () => {
-      cancelled = true;
-    };
-  }, [visible, page.fileId, page.sourceIndex, getBitmap]);
-
-  useEffect(() => {
-    if (!bitmap || !canvasRef.current) return;
-    drawPage(canvasRef.current, bitmap, page.rotation, page.crop);
-  }, [bitmap, page.rotation, page.crop]);
 
   const onPointerDown = useCallback(
     (event, overlay, mode) => {

@@ -870,6 +870,59 @@ body {
   }
 }
 
+/* --- Redaction ------------------------------------------------------------ */
+
+.redact-layer {
+  cursor: crosshair;
+}
+
+.redaction-box {
+  position: absolute;
+  background: rgba(17, 24, 39, 0.82);
+  border: 1px solid #111827;
+  cursor: move;
+  touch-action: none;
+}
+
+.redaction-box.selected {
+  outline: 2px solid var(--primary);
+  outline-offset: 1px;
+}
+
+/* While being drawn it is deliberately see-through: you need to know what you are covering. */
+.redaction-box.drawing {
+  background: rgba(17, 24, 39, 0.45);
+  border-style: dashed;
+  pointer-events: none;
+}
+
+.redaction-remove {
+  position: absolute;
+  top: -10px;
+  right: -10px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text);
+  font-size: 14px;
+  line-height: 1;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+@media (pointer: coarse) {
+  .redaction-remove {
+    width: 28px;
+    height: 28px;
+    top: -14px;
+    right: -14px;
+  }
+}
+
 /* --- Page selection ------------------------------------------------------- */
 
 .page-select {

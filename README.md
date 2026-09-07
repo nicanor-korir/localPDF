@@ -24,12 +24,14 @@ I can't trust some files on online tools, so I built a simple local solution
 | **[Convert](https://merge-pdf.nicanor.xyz/convert)** | Turn a PDF into PNG or JPEG images, plain text, Markdown or a Word document |
 | **[Compress](https://merge-pdf.nicanor.xyz/compress)** | Make a PDF smaller by re-encoding its images — never returns a bigger file |
 | **[Edit](https://merge-pdf.nicanor.xyz/edit)** | Add text and images on top of a page, and drag them into place |
+| **[Redact](https://merge-pdf.nicanor.xyz/redact)** | Remove content for good — and check it is gone before downloading |
 
 Your files carry over between tools — merge a few documents, switch to Organise to rearrange
 them, then Split the result, without loading anything twice. Nothing is written to disk on the
 way; the session lives in the tab, so a reload is a fresh start.
 
-More are on the way; see [docs/ROADMAP.md](docs/ROADMAP.md) for what and in what order.
+Every tool on the roadmap is now built; see [docs/ROADMAP.md](docs/ROADMAP.md) for how the
+engine decisions were made.
 
 ## Features
 

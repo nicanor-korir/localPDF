@@ -134,12 +134,20 @@ rather than more UI.
 It deliberately does not edit text that is already on the page. That would need
 the document's own fonts in an editable form, which a PDF does not carry.
 
-### Phase 5 — Redact
+### Phase 5 — Redact — **DONE**
 Last, deliberately. A redaction that draws a black box over text is a **data
-leak**, and this app's whole claim is that it does not leak. Real removal only:
-strip the text‑showing operators and image XObjects that fall inside the region,
-then verify by re‑extracting text from the output and asserting the redacted
-string is gone.
+leak**, and this app's whole claim is that it does not leak.
+
+Shipped as `/redact`, and not by the route first considered. Stripping individual
+text‑showing operators out of a content stream needs glyph widths from the
+embedded fonts to know where each string ends, and getting that subtly wrong
+produces a document that *looks* redacted — the one failure mode that matters
+here. So a redacted page is rendered to pixels and replaced by that image
+instead: total removal, at the cost of that page's selectable text and links,
+which the page says plainly. Pages with no regions are untouched.
+
+`verifyRedaction()` then re‑opens the finished document with pdf.js and confirms
+those pages carry no text at all. Nothing downloads until that passes.
 
 ---
 

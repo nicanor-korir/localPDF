@@ -35,6 +35,10 @@
     {
       "source": "/edit",
       "destination": "/edit.html"
+    },
+    {
+      "source": "/redact",
+      "destination": "/redact.html"
     }
   ],
   "headers": [

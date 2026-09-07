@@ -115,5 +115,16 @@ export function usePdfOutput({ showToast }) {
     [],
   );
 
-  return { busy, progress, cancel, build, deliverSingle, deliverZip };
+  return {
+    busy,
+    progress,
+    cancel,
+    build,
+    deliverSingle,
+    deliverZip,
+    // Exposed so a tool with preparation of its own — redaction renders every marked page
+    // before anything is built — can show the same overlay rather than sitting silent.
+    setBusy,
+    setProgress,
+  };
 }

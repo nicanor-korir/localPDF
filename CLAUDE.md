@@ -46,6 +46,8 @@ app/
     use-selection.js — Which pages are ticked, keyed by page id
     pdf-render.js    — loadPdfjs(), drawPage(), render constants
     convert.js       — Page -> image at export resolution, and text extraction
+    redact.js        — Burn regions into the pixels, and check the text is really gone
+    use-page-raster.js— Lazy page rendering shared by the edit and redact tools
     download.js      — Blob -> download, with the deferred revoke
 lib/
   tools.js         — The tool registry (plain data; drives the row, the routes and CI)
@@ -59,7 +61,7 @@ lib/
   pdf-lexer.js     — A targeted PDF reader. Not a parser; must not become one.
   text-layout.js   — pdf.js text items -> lines, paragraphs, headings; Markdown and text
   docx.js          — A Word document, built as OOXML over lib/zip.js
-  overlays.js      — Things added on top of a page: text and images (pure, undoable)
+  overlays.js      — Things added on top of a page: text, images, redactions (pure, undoable)
   draw-overlays.js — Drawing them onto a page, honouring the page's /Rotate
   pdf-compress.js  — Re-encode the images; never returns a larger file
   pdf-images.js    — Which images can be touched, and how to describe them afterwards
@@ -618,6 +620,30 @@ box in local state and calls `onChangeBox` once, on `pointerup`.
 **It cannot edit text that is already there**, and says so. That would need the document's own
 fonts in an editable form, which a PDF does not carry.
 
+### Redact
+⚠️ **A black rectangle drawn over text in a PDF hides nothing.** The text is still an object in
+the file; anyone can select it, copy it, or read it with a parser. Tools that ship that as
+"redaction" are why people's names keep turning up in supposedly redacted documents. This app's
+whole claim is that it does not leak, so it cannot be one of them.
+
+So a redacted page is **rendered to pixels and replaced by that image**. Everything on it stops
+existing as text — the words under the box and the words beside it. The cost is real and the
+page states it plainly: a redacted page loses its selectable text and its links. Pages with no
+regions are untouched.
+
+**The result is checked before it downloads.** `verifyRedaction()` re-opens the finished
+document with pdf.js and confirms those pages carry no text at all; if any does, nothing is
+downloaded and the page says which. "It looked right" is exactly the evidence every leaked
+redaction had, so this is a check rather than a belief.
+
+Redactions live in the overlay model, so they inherit undo, reconciliation and dragging — but
+they are *not* drawn by `draw-overlays.js`. They carry no colour or opacity either: a redaction
+is not a rectangle you can configure, it is a promise that what was underneath is gone, and a
+transparency setting would invite making that promise false.
+
+The replacement page entry has `rotation: 0` and no crop, because both are already in the
+pixels, and carries `pageBox` so it comes out exactly the size the original was.
+
 ### Compress
 Almost all of it happens in the images. In any document worth compressing, one scanned page
 outweighs the entire object graph, so this re-encodes the large images and leaves everything
@@ -786,7 +812,7 @@ const selection = usePageSelection(pages);   // keyed by page id, survives reord
 ## Verifying
 
 ```bash
-bun run test    # 383 assertions over the pipeline, page model, ranges, zip, settings and transforms
+bun run test    # 387 assertions over the pipeline, page model, ranges, zip, settings and transforms
 ```
 
 The suite builds real PDFs (linked, form-bearing, rotated, landscape, encrypted, page-less,

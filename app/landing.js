@@ -111,19 +111,26 @@ export default function Landing() {
                 <path d="M12 3l7 3v6c0 4.4-2.9 8.3-7 9.5C7.9 20.3 5 16.4 5 12V6z" strokeLinejoin="round" />
                 <path d="M9.2 12.2l2 2 3.6-3.9" strokeLinecap="round" strokeLinejoin="round" />
               </svg>
-              Your files stay on your computer
+              {/* Deliberately not about where the files go: the headline directly below now
+                  says that, and the two read as a stutter when they both open "Your files". */}
+              Everything runs in your browser
             </p>
 
+            {/*
+              "Never leave this device" rather than "never touch your files": the second says
+              nothing a reader can picture, while the first names the boundary every other part
+              of this page draws. The lead then restates the promise in plainer words before it
+              lists a single tool, because the promise is the reason anyone is still reading.
+            */}
             <h1>
               Every PDF tool you need.
               <br />
-              <span className="lp-accent">None of them touch your files.</span>
+              <span className="lp-accent">Your files never leave this device.</span>
             </h1>
 
             <p className="lp-lead">
-              Merge, split, compress, convert, edit and redact. It all happens right here in your
-              browser, so your documents never go anywhere. No sign up, no size limits, nothing
-              to install.
+              Your file opens in this tab and stays there. Merge, split, compress, convert, edit
+              and redact, all on your own machine.
             </p>
 
             <ul className="lp-trust">
@@ -175,8 +182,10 @@ export default function Landing() {
               <span className="lp-drop-hint">PDF, PNG, JPG and WebP</span>
               <span className="btn btn-primary lp-drop-button">Or choose a file</span>
             </label>
+            {/* The lead already says the file opens here and stays, so this adds the half it
+                does not cover: nothing is kept either. */}
             <p className="lp-hero-panel-note">
-              It opens in this tab. It is not sent anywhere, and it is gone when you close it.
+              Read from your disk, never copied off it, and gone when you close the tab.
             </p>
           </div>
         </section>

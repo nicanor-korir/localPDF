@@ -73,6 +73,7 @@ lib/
   compress-image-worker.js — OffscreenCanvas encoder used inside the worker
   pages.js         — The page model: reconcile, reorder, rotate, crop, remove (all pure)
   output-settings.js— Page sizes, image quality presets, download-name sanitising
+  page-geometry.js — The page maths that needs no pdf-lib. Keep it that way.
   pdf-geometry.js  — A4 fitting, annotation transforms, rotation/crop -> content-space maths
   file-types.js    — Validation, MIME resolution, download naming, id generation
   compress-image.js— Browser-only canvas -> baseline JPEG, applying rotation + crop
@@ -118,6 +119,21 @@ bun run check:offline  # Assert the built export can actually work offline (also
 ```
 
 ## Architecture Notes
+
+### Nothing app-facing may import pdf-lib at the top level
+⚠️ `lib/pdf-geometry.js` imports pdf-lib. `lib/pages.js` used to take `isCropMeaningful` and
+`normalizeRotation` from it, and `pages.js` is reached from the document session — so **every
+page of the app downloaded 425 KB of pdf-lib before it could render**, for two lines of
+arithmetic. First-load JS was 1032 KB; splitting those two functions into `lib/page-geometry.js`
+took it to 604 KB.
+
+Both copies of pdf-lib are meant to be lazily loaded — one inside the PDF worker, one in the
+main-thread fallback — and a static import anywhere app code can reach undoes that silently. If
+you add a helper that the UI needs, put it somewhere dependency-free and check:
+
+```bash
+bun run build && node scripts/check-bundle.mjs
+```
 
 ### One app, many tools
 Each tool is its own route (`/`, `/organise`, `/extract`, `/split`), not a tab. A URL can be

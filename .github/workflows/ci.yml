@@ -33,6 +33,11 @@ jobs:
       - name: Check the offline bundle is complete
         run: node scripts/check-offline-bundle.mjs
 
+      # pdf-lib and pdf.js are meant to arrive lazily. A single top-level import anywhere the
+      # UI can reach undoes that, and the only symptom is a slower first paint.
+      - name: Check the first-load bundle
+        run: node scripts/check-bundle.mjs
+
       # The worker must match the installed pdfjs-dist exactly — a drift here makes pdf.js
       # throw "The API version X does not match the Worker version Y" at runtime, which no
       # amount of building would surface.

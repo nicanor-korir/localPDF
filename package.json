@@ -15,7 +15,8 @@
     "copy-pdf-worker": "node scripts/copy-pdf-worker.mjs",
     "generate-icons": "node scripts/generate-icons.mjs",
     "build-worker": "node scripts/build-worker.mjs",
-    "check:offline": "node scripts/check-offline-bundle.mjs"
+    "check:offline": "node scripts/check-offline-bundle.mjs",
+    "check:bundle": "node scripts/check-bundle.mjs"
   },
   "dependencies": {
     "next": "^16.3.4",

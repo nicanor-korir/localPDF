@@ -35,6 +35,11 @@ export function usePdfOutput({ showToast }) {
     async ({ jobs, sources, pageSize, quality, deliver, successMessage, failureLabel = 'Failed' }) => {
       if (busy || jobs.length === 0) return;
       setBusy(true);
+      // Never leave the overlay on its bare "Working..." default. The first real progress
+      // message comes from the worker, so until one arrives the overlay would say nothing at
+      // all about what stage the job is at — which is exactly what a stuck job looked like the
+      // one time this went wrong, and it made the report much harder to place.
+      setProgress('Getting started...');
 
       const run = runPdfJobs({ jobs, sources, pageSize, quality, onProgress: setProgress });
       jobRef.current = run;

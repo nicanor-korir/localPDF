@@ -13,8 +13,11 @@
  * exists. A reload is still a fresh start, which is the honest behaviour for a tool that
  * promises to keep nothing.
  *
- * Undo history travels with the pages, because it describes the same document.
+ * Undo history covers the pages *and* the overlays together, because they describe one
+ * document: undoing a page deletion has to bring back what was written on it.
  */
+
+import { reconcileOverlays } from '../../lib/overlays';
 
 // Undo depth. Deep enough to walk back a run of mistaken edits, bounded so a long session
 // cannot retain thousands of page arrays.
@@ -33,7 +36,7 @@ export const rasters = new Map();
 export const seen = new Set();
 
 let history = [];
-let state = { files: [], pages: [], historyDepth: 0, countsVersion: 0 };
+let state = { files: [], pages: [], overlays: [], historyDepth: 0, countsVersion: 0 };
 
 const listeners = new Set();
 
@@ -47,7 +50,7 @@ export function getSnapshot() {
 }
 
 // Static prerender has no session. A stable object keeps useSyncExternalStore from looping.
-const SERVER_SNAPSHOT = { files: [], pages: [], historyDepth: 0, countsVersion: 0 };
+const SERVER_SNAPSHOT = { files: [], pages: [], overlays: [], historyDepth: 0, countsVersion: 0 };
 export function getServerSnapshot() {
   return SERVER_SNAPSHOT;
 }
@@ -59,6 +62,11 @@ function commit(next) {
 
 export const getFiles = () => state.files;
 export const getPages = () => state.pages;
+export const getOverlays = () => state.overlays;
+
+const remember = () => {
+  history = [...history, { pages: state.pages, overlays: state.overlays }].slice(-HISTORY_LIMIT);
+};
 
 export function setFiles(files) {
   if (files === state.files) return;
@@ -69,11 +77,17 @@ export function bumpCounts() {
   commit({ countsVersion: state.countsVersion + 1 });
 }
 
-/** Replace the pages without recording an undo step — used by reconciliation. */
+/**
+ * Replace the pages without recording an undo step — used by reconciliation.
+ *
+ * Overlays are reconciled at the same time: a page that has gone must take what was written on
+ * it, or the writing reattaches itself to whatever page inherits the id.
+ */
 export function resetPages(pages) {
-  if (pages === state.pages) return;
+  const overlays = reconcileOverlays(state.overlays, pages);
+  if (pages === state.pages && overlays === state.overlays) return;
   history = [];
-  commit({ pages, historyDepth: 0 });
+  commit({ pages, overlays, historyDepth: 0 });
 }
 
 /**
@@ -87,8 +101,20 @@ export function mutatePages(fn) {
   const prev = state.pages;
   const next = fn(prev);
   if (next === prev) return false;
-  history = [...history, prev].slice(-HISTORY_LIMIT);
-  commit({ pages: next, historyDepth: history.length });
+  remember();
+  // Overlays follow their pages: deleting a page takes what was written on it, and undo brings
+  // both back together.
+  commit({ pages: next, overlays: reconcileOverlays(state.overlays, next), historyDepth: history.length });
+  return true;
+}
+
+/** The same contract for overlays: an operation that changes nothing records no undo step. */
+export function mutateOverlays(fn) {
+  const prev = state.overlays;
+  const next = fn(prev);
+  if (next === prev) return false;
+  remember();
+  commit({ overlays: next, historyDepth: history.length });
   return true;
 }
 
@@ -96,7 +122,7 @@ export function undoPages() {
   if (history.length === 0) return false;
   const restored = history[history.length - 1];
   history = history.slice(0, -1);
-  commit({ pages: restored, historyDepth: history.length });
+  commit({ pages: restored.pages, overlays: restored.overlays, historyDepth: history.length });
   return true;
 }
 
@@ -116,7 +142,7 @@ export function clearAll() {
   rasters.clear();
   seen.clear();
   history = [];
-  commit({ files: [], pages: [], historyDepth: 0 });
+  commit({ files: [], pages: [], overlays: [], historyDepth: 0 });
 }
 
 export function forget(entry) {

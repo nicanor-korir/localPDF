@@ -36,7 +36,7 @@ import { MAX_CACHED_RASTERS, PREVIEW_SCALE, loadPdfjs } from './pdf-render';
  * the component, because it genuinely should reset when the tool changes.
  */
 export function useDocumentSession() {
-  const { files, pages, historyDepth, countsVersion } = useSyncExternalStore(
+  const { files, pages, overlays, historyDepth, countsVersion } = useSyncExternalStore(
     store.subscribe,
     store.getSnapshot,
     store.getServerSnapshot,
@@ -264,6 +264,14 @@ export function useDocumentSession() {
     [announce],
   );
 
+  /** Apply an overlay operation, on the same undo terms as a page operation. */
+  const editOverlays = useCallback(
+    (fn, message) => {
+      if (store.mutateOverlays(fn) && message) announce(message);
+    },
+    [announce],
+  );
+
   const undo = useCallback(() => {
     setCroppingId(null);
     if (store.undoPages()) announce('Undid the last change');
@@ -376,6 +384,8 @@ export function useDocumentSession() {
   return {
     files,
     pages,
+    overlays,
+    editOverlays,
     totalPages: pages.length,
     docs: store.docs,
     grouped,

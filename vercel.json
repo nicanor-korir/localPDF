@@ -31,6 +31,10 @@
     {
       "source": "/compress",
       "destination": "/compress.html"
+    },
+    {
+      "source": "/edit",
+      "destination": "/edit.html"
     }
   ],
   "headers": [

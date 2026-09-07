@@ -56,7 +56,24 @@ export function usePdfOutput({ showToast }) {
           }
         }
 
-        if (skipped.length) {
+        // Characters the built-in fonts could not write were substituted, not dropped. Saying
+        // so before the user files the document is the whole point of tracking them.
+        const unwritable = [
+          ...new Set(
+            outputs.flatMap((output) =>
+              (output.overlayNotes || [])
+                .filter((note) => note.type === 'unwritable')
+                .flatMap((note) => note.characters),
+            ),
+          ),
+        ];
+        if (unwritable.length) {
+          showToast(
+            `Downloaded, but ${unwritable.map((c) => `"${c}"`).join(', ')} could not be written ` +
+              'with the built-in font and became "?".',
+            true,
+          );
+        } else if (skipped.length) {
           // An error toast so it lingers and is announced assertively — a silently dropped
           // file is exactly what the user needs to hear about.
           showToast(

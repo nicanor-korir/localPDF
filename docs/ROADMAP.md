@@ -122,9 +122,17 @@ Markdown and Word. Images are faithful — each page rendered at the chosen
 resolution with its rotation and crop. Text is heuristic and the page says so;
 there is no OCR, so a scan converts to images or not at all.
 
-### Phase 4 — Edit — next
-Add text, images and blank pages; move and resize what you added. pdf-lib can do
-all of it; the work is the direct‑manipulation UI.
+### Phase 4 — Edit — **mostly done**
+Shipped as `/edit`: add text and images on top of a page, drag to move, pull the
+corner to resize, with undo. Text uses the built‑in WinAnsi fonts, so anything
+they cannot write is substituted *and reported* rather than dropped.
+
+**Still to do:** inserting a blank page. That needs a page‑model change — every
+`pages[]` entry currently points at a source — so it is a separate piece of work
+rather than more UI.
+
+It deliberately does not edit text that is already on the page. That would need
+the document's own fonts in an editable form, which a PDF does not carry.
 
 ### Phase 5 — Redact
 Last, deliberately. A redaction that draws a black box over text is a **data

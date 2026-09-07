@@ -59,6 +59,8 @@ lib/
   pdf-lexer.js     — A targeted PDF reader. Not a parser; must not become one.
   text-layout.js   — pdf.js text items -> lines, paragraphs, headings; Markdown and text
   docx.js          — A Word document, built as OOXML over lib/zip.js
+  overlays.js      — Things added on top of a page: text and images (pure, undoable)
+  draw-overlays.js — Drawing them onto a page, honouring the page's /Rotate
   pdf-compress.js  — Re-encode the images; never returns a larger file
   pdf-images.js    — Which images can be touched, and how to describe them afterwards
   recode-image.js  — Shared decode/downsample/encode; -worker and -dom supply the canvas
@@ -584,6 +586,38 @@ throttling there is the right default.
 **No OCR.** A scanned page has no text layer, so text conversion of one produces nothing; the
 tool detects that and says to convert to images instead, rather than downloading an empty file.
 
+### Edit
+An overlay is something the user added on top of a page — a line of text, or an image. Its
+geometry is in **display space**, the same convention as `crop`: origin top-left, y down, 0..1
+fractions. That is the space a box is dragged in, so it is the space the model stores.
+
+⚠️ **Overlays are drawn after `applyPageTransform` and before `fitPageToBox`.** That moment is
+the whole trick: the media box is then exactly the content the user was looking at when they
+placed the overlay, so a 0..1 coordinate means the same thing on the page as it did on screen,
+and fitting to A4 carries the overlay along with everything else. An image page uses the
+picture's rectangle rather than the whole sheet, because that is what the overlay sits on.
+
+`placeInContentRect()` in `pdf-geometry.js` handles the rotation. A viewer rotates a page
+clockwise by `/Rotate`, so anything drawn on it must be rotated the other way to come out
+upright — and rotating a rectangle about a corner moves it, so the anchor corner changes with
+the angle. Both fall out of one question: which corner of the drawn box ends up at the content
+rect's origin once the rotation is applied. The test renders the output with pdf.js and puts
+each piece of text through the *viewport* transform, so it answers "is it where the user put it
+on screen" rather than the easy question that means nothing.
+
+**The built-in fonts are WinAnsi.** Embedding one that could write anything else means shipping
+a font file for a text box, which is a poor trade. So the limit is real: unwritable characters
+are substituted with `?` and **reported** — named in the editor as you type, and again in a
+toast after the download. Dropping them silently would put a document in someone's hands with
+words missing from it.
+
+**Dragging commits on release, not on move.** A store write per `pointermove` would re-render
+every page in the document and fill the undo stack with a step per pixel; `EditPage` keeps the
+box in local state and calls `onChangeBox` once, on `pointerup`.
+
+**It cannot edit text that is already there**, and says so. That would need the document's own
+fonts in an editable form, which a PDF does not carry.
+
 ### Compress
 Almost all of it happens in the images. In any document worth compressing, one scanned page
 outweighs the entire object graph, so this re-encodes the large images and leaves everything
@@ -752,7 +786,7 @@ const selection = usePageSelection(pages);   // keyed by page id, survives reord
 ## Verifying
 
 ```bash
-bun run test    # 336 assertions over the pipeline, page model, ranges, zip, settings and transforms
+bun run test    # 383 assertions over the pipeline, page model, ranges, zip, settings and transforms
 ```
 
 The suite builds real PDFs (linked, form-bearing, rotated, landscape, encrypted, page-less,

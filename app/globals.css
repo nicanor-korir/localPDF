@@ -769,6 +769,107 @@ body {
   flex-shrink: 0;
 }
 
+/* --- The editor: things added on top of a page ----------------------------- */
+
+.overlay-layer {
+  position: absolute;
+  inset: 0;
+  /* The layer itself must not swallow clicks meant for the page beneath, but the boxes on it
+     must catch theirs — so pointer events are enabled per box, not on the layer. */
+  touch-action: none;
+}
+
+.overlay-box {
+  position: absolute;
+  border: 1px dashed transparent;
+  border-radius: 2px;
+  cursor: move;
+  display: flex;
+  align-items: flex-start;
+  overflow: visible;
+  /* A drag must keep tracking even when the pointer leaves the box. */
+  touch-action: none;
+}
+
+.overlay-box:hover {
+  border-color: var(--border-hover);
+}
+
+.overlay-box.selected {
+  border-color: var(--primary);
+  border-style: solid;
+  box-shadow: 0 0 0 1px var(--primary-glow);
+}
+
+.overlay-text {
+  /* Sized as a percentage of the page height, so what is on screen is the size that gets
+     written into the document. */
+  font-family: Helvetica, Arial, sans-serif;
+  line-height: 1.05;
+  white-space: pre;
+  user-select: none;
+  color: var(--text);
+}
+
+.overlay-text[data-colour='red'] {
+  color: #cc1a1a;
+}
+
+.overlay-text[data-colour='blue'] {
+  color: #2647d9;
+}
+
+.overlay-text[data-colour='white'] {
+  color: #fff;
+}
+
+.overlay-image {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border: 1px solid var(--primary);
+  background: repeating-linear-gradient(
+    45deg,
+    var(--primary-light),
+    var(--primary-light) 6px,
+    transparent 6px,
+    transparent 12px
+  );
+}
+
+.overlay-handle {
+  position: absolute;
+  right: -6px;
+  bottom: -6px;
+  width: 12px;
+  height: 12px;
+  border-radius: 3px;
+  background: var(--primary);
+  border: 2px solid var(--surface);
+  cursor: nwse-resize;
+  touch-action: none;
+}
+
+.overlay-editor {
+  border-top: 1px solid var(--border);
+  padding-top: 4px;
+}
+
+.overlay-editor .field-help,
+.overlay-editor .field-error {
+  padding: 0 16px;
+}
+
+/* Touch devices need a target bigger than a 12px dot. */
+@media (pointer: coarse) {
+  .overlay-handle {
+    width: 22px;
+    height: 22px;
+    right: -11px;
+    bottom: -11px;
+  }
+}
+
 /* --- Page selection ------------------------------------------------------- */
 
 .page-select {

@@ -1,22 +1,22 @@
 'use client';
 
 import { useCallback, useState } from 'react';
-import { buildDownloadName } from '../lib/file-types';
+import { buildDownloadName } from '../../lib/file-types';
 import {
   DEFAULT_PAGE_SIZE,
   DEFAULT_QUALITY,
   PAGE_SIZES,
   QUALITY_PRESETS,
   sanitizeDownloadName,
-} from '../lib/output-settings';
-import { ToolIntro } from './_components/tool-intro';
-import { DropZone } from './_components/drop-zone';
-import { LiveRegion, ProgressOverlay, Toast } from './_components/feedback';
-import { PageGrid } from './_components/page-grid';
-import { SourceList } from './_components/source-list';
-import { ToolShell } from './_components/tool-shell';
-import { useDocumentSession } from './_lib/use-document';
-import { usePdfOutput } from './_lib/use-pdf-output';
+} from '../../lib/output-settings';
+import { ToolIntro } from '../_components/tool-intro';
+import { DropZone } from '../_components/drop-zone';
+import { LiveRegion, ProgressOverlay, Toast } from '../_components/feedback';
+import { PageGrid } from '../_components/page-grid';
+import { SourceList } from '../_components/source-list';
+import { ToolShell } from '../_components/tool-shell';
+import { useDocumentSession } from '../_lib/use-document';
+import { usePdfOutput } from '../_lib/use-pdf-output';
 
 const DownloadIcon = ({ size = 16 }) => (
   <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" aria-hidden="true" focusable="false">

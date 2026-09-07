@@ -46,7 +46,7 @@ export function PrivacyBadge() {
         type="button"
         className="privacy-badge"
         aria-expanded={open}
-        aria-label="Private — how this is enforced"
+        aria-label="Private. How this is enforced"
         onClick={() => setOpen((v) => !v)}
       >
         <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" aria-hidden="true" focusable="false">
@@ -68,7 +68,7 @@ export function PrivacyBadge() {
           <p className="privacy-heading">Don&apos;t take our word for it</p>
           <p className="privacy-check">
             Open your browser&apos;s developer tools, switch to the Network tab, then add files and
-            merge them. Nothing leaves — you&apos;ll see requests for this page&apos;s own assets and
+            merge them. Nothing leaves, so you&apos;ll see requests for this page&apos;s own assets and
             nothing else.
           </p>
 

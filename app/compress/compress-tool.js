@@ -175,7 +175,7 @@ export default function CompressTool() {
               {result && (
                 <p className={result.changed ? 'field-help' : 'field-error'}>
                   {result.changed
-                    ? `${formatSize(result.before)} → ${formatSize(result.after)} — ` +
+                    ? `${formatSize(result.before)} to ${formatSize(result.after)}, ` +
                       `${percent(result.before - result.after, result.before)}% smaller, ` +
                       `${result.recoded} image${result.recoded === 1 ? '' : 's'} re-encoded. ` +
                       `Saved as ${result.name}.`

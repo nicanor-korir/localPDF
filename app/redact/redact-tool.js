@@ -141,7 +141,7 @@ export default function RedactTool() {
         if (leaked.length > 0) {
           setResult({ ok: false, leaked });
           throw new Error(
-            `text is still readable on page ${leaked.map((i) => i + 1).join(', ')} — nothing was downloaded`,
+            `text is still readable on page ${leaked.map((i) => i + 1).join(', ')}, so nothing was downloaded`,
           );
         }
         setResult({ ok: true, pages: prepared.redactedIndexes.length });

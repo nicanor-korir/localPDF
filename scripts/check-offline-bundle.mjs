@@ -35,7 +35,10 @@ const assets = JSON.parse(match[1]);
 
 // Every tool in the registry must have a shell in the export. Without this, adding a tool to
 // lib/tools.js and forgetting the route ships a nav link to a 404.
-const shells = READY_TOOLS.map((tool) => (tool.href === '/' ? './index.html' : `.${tool.href}.html`));
+// The landing page plus one shell per tool. It is listed separately because no tool claims
+// "/" any more, and a home page missing from the precache is an offline visit that fails at
+// the front door.
+const shells = ['./index.html', ...READY_TOOLS.map((tool) => `.${tool.href}.html`)];
 
 const required = [
   ...shells,

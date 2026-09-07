@@ -1496,6 +1496,566 @@ body {
 
 /* ─────────────────────── Accessibility utilities ─────────────────────── */
 
+
+/* ==========================================================================
+   The landing page
+   ==========================================================================
+   Its own layout, deliberately. The tools are a working surface where chrome
+   should get out of the way; this is the one page whose job is to explain, so
+   it gets room to breathe and type large enough to be read from across a desk.
+
+   The one visual idea worth keeping: colour is used almost nowhere, so the two
+   places it does appear (the headline accent and the proof band) carry weight.
+   ========================================================================== */
+
+.lp {
+  --lp-gutter: clamp(20px, 5vw, 64px);
+  --lp-max: 1120px;
+  --lp-ink: #101423;
+  background: var(--surface);
+  color: var(--text);
+}
+
+.lp-header {
+  max-width: var(--lp-max);
+  margin: 0 auto;
+  padding: 22px var(--lp-gutter);
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.lp-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  font-weight: 700;
+  font-size: 1.02rem;
+  letter-spacing: -0.02em;
+  color: var(--text);
+  text-decoration: none;
+}
+
+.lp-mark {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 9px;
+  background: var(--primary-light);
+  color: var(--primary);
+}
+
+.lp-header-links {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 26px;
+  font-size: 0.88rem;
+}
+
+.lp-header-links a {
+  color: var(--text-secondary);
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.lp-header-links a:hover {
+  color: var(--text);
+}
+
+.lp-header-links a.lp-header-cta,
+.lp-header-links a.lp-header-cta:hover {
+  color: var(--on-primary);
+  text-decoration: none;
+}
+
+/* --- Hero ----------------------------------------------------------------- */
+
+/* Two columns so the interactive half of the page is not left as empty margin on a wide
+   screen. The drop zone is the product; giving it a column of its own says so. */
+.lp-hero {
+  max-width: var(--lp-max);
+  margin: 0 auto;
+  padding: clamp(36px, 6vw, 84px) var(--lp-gutter) clamp(48px, 7vw, 88px);
+  display: grid;
+  grid-template-columns: minmax(0, 1.18fr) minmax(0, 0.82fr);
+  gap: clamp(32px, 4.5vw, 56px);
+  align-items: center;
+}
+
+.lp-hero-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.lp-hero-panel-note {
+  font-size: 0.82rem;
+  line-height: 1.55;
+  color: var(--text-tertiary);
+  text-align: center;
+  max-width: 26rem;
+  margin: 0 auto;
+}
+
+.lp-eyebrow {
+  font-size: 0.78rem;
+  font-weight: 650;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--primary);
+  margin-bottom: 20px;
+}
+
+.lp h1 {
+  font-size: clamp(2.3rem, 6.2vw, 4rem);
+  line-height: 1.03;
+  letter-spacing: -0.035em;
+  font-weight: 750;
+}
+
+.lp-accent {
+  color: var(--primary);
+}
+
+.lp-lead {
+  margin-top: 22px;
+  max-width: 38rem;
+  font-size: clamp(1rem, 1.6vw, 1.12rem);
+  line-height: 1.62;
+  color: var(--text-secondary);
+}
+
+/* The drop zone is the real control, not a picture of one. Someone who arrived
+   ready to work can start here without reading another word. */
+.lp-drop {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 7px;
+  padding: clamp(34px, 5vw, 52px) 24px;
+  border: 2px dashed var(--border-hover);
+  border-radius: var(--radius);
+  background: var(--surface-raised);
+  color: var(--text-secondary);
+  cursor: pointer;
+  text-align: center;
+  transition: border-color var(--transition), background var(--transition), transform var(--transition);
+}
+
+.lp-drop:hover,
+.lp-drop.is-dragging {
+  border-color: var(--primary);
+  background: var(--primary-light);
+  color: var(--primary);
+}
+
+.lp-drop.is-dragging {
+  transform: scale(1.01);
+}
+
+.lp-drop-title {
+  font-size: 1.02rem;
+  font-weight: 650;
+  color: var(--text);
+}
+
+.lp-drop:hover .lp-drop-title,
+.lp-drop.is-dragging .lp-drop-title {
+  color: var(--primary);
+}
+
+.lp-drop-hint {
+  font-size: 0.84rem;
+}
+
+.lp-trust {
+  margin-top: 22px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 26px;
+  list-style: none;
+  font-size: 0.86rem;
+  color: var(--text-secondary);
+}
+
+.lp-trust li {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* A real tick: a disc, and two sides of a box rotated to make the check. An empty ring reads
+   as a bullet and says nothing at all. */
+.lp-trust li {
+  position: relative;
+  padding-left: 26px;
+}
+
+.lp-trust li::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 50%;
+  margin-top: -9px;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--success);
+}
+
+.lp-trust li::after {
+  content: '';
+  position: absolute;
+  left: 6px;
+  top: 50%;
+  margin-top: -5px;
+  width: 5px;
+  height: 9px;
+  border-right: 2px solid #fff;
+  border-bottom: 2px solid #fff;
+  transform: rotate(45deg);
+}
+
+/* --- Sections ------------------------------------------------------------- */
+
+.lp-section {
+  max-width: var(--lp-max);
+  margin: 0 auto;
+  padding: clamp(44px, 6vw, 80px) var(--lp-gutter);
+}
+
+.lp-section-head {
+  max-width: 40rem;
+  margin-bottom: 34px;
+}
+
+.lp h2 {
+  font-size: clamp(1.5rem, 3.1vw, 2.1rem);
+  line-height: 1.15;
+  letter-spacing: -0.028em;
+  font-weight: 720;
+}
+
+.lp-section-head p {
+  margin-top: 12px;
+  color: var(--text-secondary);
+  line-height: 1.62;
+}
+
+/* --- Tool grid ------------------------------------------------------------ */
+
+/* Ten tools. Five across leaves two even rows; four across leaves an orphan pair. */
+.lp-tools {
+  list-style: none;
+  display: grid;
+  gap: 12px;
+  grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+}
+
+@media (min-width: 1040px) {
+  .lp-tools {
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+  }
+}
+
+.lp-tool {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  grid-template-areas: 'icon name' 'icon blurb';
+  gap: 2px 14px;
+  height: 100%;
+  padding: 18px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+  text-decoration: none;
+  transition: border-color var(--transition), box-shadow var(--transition), transform var(--transition);
+}
+
+.lp-tool:hover {
+  border-color: var(--primary);
+  box-shadow: 0 6px 18px var(--primary-glow);
+  transform: translateY(-2px);
+}
+
+.lp-tool-icon {
+  grid-area: icon;
+  display: grid;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  background: var(--primary-light);
+  color: var(--primary);
+}
+
+.lp-tool-name {
+  grid-area: name;
+  align-self: end;
+  font-weight: 650;
+  color: var(--text);
+  letter-spacing: -0.01em;
+}
+
+.lp-tool-blurb {
+  grid-area: blurb;
+  font-size: 0.84rem;
+  line-height: 1.45;
+  color: var(--text-secondary);
+}
+
+/* --- The proof band ------------------------------------------------------- */
+
+.lp-proof {
+  background: var(--lp-ink);
+  color: #e9ecf5;
+}
+
+.lp-proof-inner {
+  max-width: var(--lp-max);
+  margin: 0 auto;
+  padding: clamp(48px, 7vw, 88px) var(--lp-gutter);
+  display: grid;
+  gap: clamp(28px, 5vw, 60px);
+  grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
+  align-items: start;
+}
+
+.lp-proof h2 {
+  color: #fff;
+}
+
+.lp-proof p {
+  margin-top: 16px;
+  line-height: 1.68;
+  color: #b9c0d4;
+  max-width: 34rem;
+}
+
+.lp-proof-note strong {
+  color: #fff;
+}
+
+/* Plain language, not a code sample. "connect-src 'self'" is the honest answer to how this
+   works, and it is meaningless to almost everyone who reads it. The technical version is one
+   click away behind the Private badge, where the people who want it will look. */
+.lp-journey {
+  margin: 0;
+  padding: 26px 26px 22px;
+  border-radius: var(--radius);
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.lp-journey figcaption {
+  font-size: 0.74rem;
+  text-transform: uppercase;
+  letter-spacing: 0.09em;
+  font-weight: 650;
+  color: #8f98b5;
+  margin-bottom: 18px;
+}
+
+.lp-journey ul {
+  list-style: none;
+  display: grid;
+  gap: 14px;
+}
+
+.lp-journey li {
+  position: relative;
+  padding-left: 32px;
+  font-size: 0.96rem;
+  line-height: 1.5;
+  color: #e9ecf5;
+}
+
+.lp-journey li::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 1px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: rgba(142, 230, 184, 0.16);
+  border: 1px solid rgba(142, 230, 184, 0.5);
+}
+
+.lp-journey li::after {
+  content: '';
+  position: absolute;
+  left: 7px;
+  top: 6px;
+  width: 5px;
+  height: 9px;
+  border-right: 2px solid #8ee6b8;
+  border-bottom: 2px solid #8ee6b8;
+  transform: rotate(45deg);
+}
+
+/* --- Highlights ----------------------------------------------------------- */
+
+.lp-highlights {
+  list-style: none;
+  display: grid;
+  gap: clamp(20px, 3vw, 40px);
+  grid-template-columns: repeat(auto-fit, minmax(248px, 1fr));
+}
+
+.lp-highlights h3 {
+  font-size: 1.03rem;
+  font-weight: 680;
+  letter-spacing: -0.015em;
+  padding-top: 16px;
+  border-top: 2px solid var(--primary);
+}
+
+.lp-highlights p {
+  margin-top: 9px;
+  color: var(--text-secondary);
+  line-height: 1.62;
+  font-size: 0.92rem;
+}
+
+/* --- FAQ ------------------------------------------------------------------ */
+
+.lp-faq-section {
+  border-top: 1px solid var(--border);
+}
+
+.lp-faq {
+  display: grid;
+  gap: 26px 44px;
+  grid-template-columns: repeat(auto-fit, minmax(288px, 1fr));
+}
+
+.lp-faq dt {
+  font-weight: 650;
+  margin-bottom: 6px;
+}
+
+.lp-faq dd {
+  margin: 0;
+  color: var(--text-secondary);
+  line-height: 1.62;
+  font-size: 0.92rem;
+}
+
+/* --- Closing call --------------------------------------------------------- */
+
+.lp-cta {
+  max-width: var(--lp-max);
+  margin: 0 auto;
+  padding: clamp(52px, 7vw, 96px) var(--lp-gutter);
+  text-align: center;
+  border-top: 1px solid var(--border);
+}
+
+.lp-cta p {
+  margin-top: 12px;
+  color: var(--text-secondary);
+}
+
+.lp-cta-button {
+  margin-top: 26px;
+  display: inline-flex;
+  padding: 13px 30px;
+  font-size: 0.98rem;
+  text-decoration: none;
+}
+
+/* --- Footer --------------------------------------------------------------- */
+
+.lp-footer {
+  background: var(--bg);
+  border-top: 1px solid var(--border);
+}
+
+.lp-footer-inner {
+  max-width: var(--lp-max);
+  margin: 0 auto;
+  padding: 44px var(--lp-gutter) 26px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 28px 60px;
+  justify-content: space-between;
+}
+
+.lp-footer-brand {
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.lp-footer-line {
+  margin-top: 5px;
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+}
+
+.lp-footer-tools {
+  list-style: none;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(96px, max-content));
+  gap: 9px 30px;
+  font-size: 0.88rem;
+}
+
+.lp-footer-tools a {
+  color: var(--text-secondary);
+  text-decoration: none;
+}
+
+.lp-footer-tools a:hover {
+  color: var(--primary);
+}
+
+.lp-footer-legal {
+  max-width: var(--lp-max);
+  margin: 0 auto;
+  padding: 0 var(--lp-gutter) 44px;
+  font-size: 0.82rem;
+  color: var(--text-tertiary);
+}
+
+.lp-footer-legal a {
+  color: var(--text-secondary);
+}
+
+@media (max-width: 900px) {
+  .lp-hero {
+    grid-template-columns: 1fr;
+    align-items: start;
+  }
+
+  .lp-hero-panel {
+    max-width: 34rem;
+  }
+}
+
+@media (max-width: 860px) {
+  .lp-proof-inner {
+    grid-template-columns: 1fr;
+  }
+
+  /* The secondary links go before the button rather than crowding it out. */
+  .lp-header-links {
+    gap: 18px;
+  }
+}
+
+@media (max-width: 520px) {
+  .lp-header-links a:not(.lp-header-cta) {
+    display: none;
+  }
+
+  .lp-drop {
+    padding: 26px 18px;
+  }
+}
+
 /* Visually hidden but available to screen readers (used for live status announcements). */
 .sr-only {
   position: absolute;

@@ -8,8 +8,8 @@ export const metadata = {
   // A template so each tool page leads with what it does — which is what someone searched for
   // — and the brand follows.
   title: {
-    default: `${SITE_NAME} — ${TAGLINE}`,
-    template: `%s — ${SITE_NAME}`,
+    default: `${SITE_NAME}: ${TAGLINE}`,
+    template: `%s · ${SITE_NAME}`,
   },
   description: DESCRIPTION,
   applicationName: SITE_NAME,
@@ -33,14 +33,14 @@ export const metadata = {
     type: 'website',
     url: SITE,
     siteName: SITE_NAME,
-    title: `${SITE_NAME} — ${TAGLINE}`,
+    title: `${SITE_NAME}: ${TAGLINE}`,
     description: DESCRIPTION,
     locale: 'en_GB',
-    images: [{ url: '/og.png', width: 1200, height: 630, alt: `${SITE_NAME} — ${TAGLINE}` }],
+    images: [{ url: '/og.png', width: 1200, height: 630, alt: `${SITE_NAME}. ${TAGLINE}` }],
   },
   twitter: {
     card: 'summary_large_image',
-    title: `${SITE_NAME} — ${TAGLINE}`,
+    title: `${SITE_NAME}: ${TAGLINE}`,
     description: DESCRIPTION,
     images: ['/og.png'],
   },

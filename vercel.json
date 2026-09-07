@@ -5,6 +5,10 @@
   "outputDirectory": "out",
   "rewrites": [
     {
+      "source": "/merge",
+      "destination": "/merge.html"
+    },
+    {
       "source": "/organise",
       "destination": "/organise.html"
     },

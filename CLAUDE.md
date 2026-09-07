@@ -26,8 +26,9 @@ it before proposing a different library.
 app/
   layout.js        — Root layout: metadata (title template), CSP <meta>, global styles
   globals.css      — All styles (CSS custom properties, responsive layout, a11y utilities)
-  page.js          — Route: / (Merge)
-  merge-tool.js    — The merge tool
+  page.js          — Route: / (the landing page)
+  landing.js       — The landing page: hero, tool grid, plain-language privacy, FAQ
+  merge/           — Route: /merge (the merge tool)
   organise/        — Route: /organise (reorder, rotate, crop, delete)
   extract/         — Route: /extract (pick pages -> a new PDF)
   split/           — Route: /split (one PDF -> many, zipped)
@@ -137,6 +138,26 @@ you add a helper that the UI needs, put it somewhere dependency-free and check:
 ```bash
 bun run build && node scripts/check-bundle.mjs
 ```
+
+### The landing page
+`/` explains the product; `/merge` is the merge tool. One page, one job. Before this the home
+page tried to be both a pitch and a workspace, which meant it did neither well and gave a
+visitor arriving from a search no idea what the site was.
+
+Two things about it are load-bearing:
+
+**The drop zone in the hero is real, not a picture of one.** Files dropped there go into the
+shared session and the router pushes to `/merge`, so someone who arrived ready to work never
+reads a word. That only works because the session already lives outside React.
+
+⚠️ **Do not put the security policy on the landing page in its raw form.** It said
+`connect-src 'self'` in a code block for about an hour, which is the honest answer and means
+nothing to almost everyone who reads it. It now says what happens to your file in four plain
+sentences, and the technical version stays one click away behind the Private badge, where the
+people who want it will look.
+
+Copy rules for anything user-facing: plain words, and **no em dashes**. Use a comma, a full
+stop or a colon.
 
 ### The name, and how search finds it
 The product is **LocalPDF**, at `localpdf.nicanor.xyz`. `merge-pdf.nicanor.xyz` still serves the

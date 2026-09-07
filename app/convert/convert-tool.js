@@ -88,7 +88,7 @@ export default function ConvertTool() {
       if (blocks.length === 0) {
         // Almost always a scan: pages of pixels with no text layer to find.
         showToast(
-          'No text found. This looks like a scanned document — convert it to images instead.',
+          'No text found. This looks like a scanned document, so convert it to images instead.',
           true,
         );
         return;

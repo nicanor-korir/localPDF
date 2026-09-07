@@ -98,7 +98,7 @@ export default function SplitTool() {
 
                 {mode === 'ranges' && (
                   <label className="setting setting-wide">
-                    <span className="setting-label">Ranges — one file each</span>
+                    <span className="setting-label">Ranges, one file each</span>
                     <input
                       type="text"
                       value={ranges}

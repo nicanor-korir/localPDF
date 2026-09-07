@@ -2583,6 +2583,115 @@ body {
   }
 }
 
+/* --- The local use agreement ---------------------------------------------- */
+
+/*
+  Sits over the tool until it is accepted. A higher z-index than the progress overlay, because
+  nothing can be running underneath it yet: it is the first thing a new visitor sees.
+*/
+.terms-gate {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background: var(--overlay);
+  backdrop-filter: blur(6px);
+  animation: fadeIn 160ms ease;
+  /* A short window still has to reach the accept button. */
+  overflow-y: auto;
+}
+
+.terms-card {
+  width: 100%;
+  max-width: 33rem;
+  margin: auto;
+  padding: 30px 32px 26px;
+  border-radius: var(--radius);
+  background: var(--surface);
+  box-shadow: var(--shadow-lg);
+}
+
+.terms-kicker {
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--primary);
+}
+
+.terms-card h2 {
+  margin-top: 9px;
+  font-size: 1.42rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+}
+
+.terms-lead {
+  margin-top: 9px;
+  color: var(--text-secondary);
+  font-size: 0.92rem;
+  line-height: 1.55;
+}
+
+.terms-points {
+  list-style: none;
+  margin-top: 22px;
+  display: grid;
+  gap: 15px;
+}
+
+.terms-points li {
+  padding-left: 15px;
+  border-left: 2px solid var(--primary-light);
+}
+
+.terms-point-title {
+  display: block;
+  font-size: 0.93rem;
+  font-weight: 650;
+  letter-spacing: -0.01em;
+}
+
+.terms-point-body {
+  display: block;
+  margin-top: 4px;
+  color: var(--text-secondary);
+  font-size: 0.87rem;
+  line-height: 1.55;
+}
+
+.terms-actions {
+  margin-top: 26px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+}
+
+.terms-foot {
+  margin-top: 16px;
+  padding-top: 14px;
+  border-top: 1px solid var(--border);
+  color: var(--text-tertiary);
+  font-size: 0.8rem;
+  line-height: 1.5;
+}
+
+@media (max-width: 520px) {
+  .terms-card {
+    padding: 24px 20px 20px;
+  }
+
+  .terms-actions .btn {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
 /* Visually hidden but available to screen readers (used for live status announcements). */
 .sr-only {
   position: absolute;

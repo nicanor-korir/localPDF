@@ -3,7 +3,9 @@
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { registerServiceWorker } from '../../lib/register-sw';
+import { useTermsAcceptance } from '../_lib/use-terms';
 import { PrivacyBadge } from './privacy-badge';
+import { TermsGate } from './terms-gate';
 import { ToolNav } from './tool-nav';
 
 /**
@@ -18,6 +20,10 @@ export function ToolShell({ title, tagline, actions, children }) {
   // as an updater and call it immediately.
   const [update, setUpdate] = useState(null);
   const [dismissed, setDismissed] = useState(false);
+
+  // `pending` is null for the first frame, while the browser is asked what it remembers. See
+  // use-terms.js: this is a static export, so neither answer is known at build time.
+  const { pending, accept } = useTermsAcceptance();
 
   useEffect(() => registerServiceWorker((apply) => setUpdate({ apply })), []);
 
@@ -70,7 +76,16 @@ export function ToolShell({ title, tagline, actions, children }) {
           </button>
         </div>
       )}
-      {children}
+      {/*
+        Marked inert rather than unmounted, so the tool's intro and questions stay in the
+        prerendered HTML where a search engine can read them. Inert takes it out of the tab
+        order and out of the accessibility tree for as long as the agreement is up.
+      */}
+      <div className="tool-shell-body" inert={pending === true}>
+        {children}
+      </div>
+
+      {pending === true && <TermsGate onAccept={accept} />}
     </>
   );
 }

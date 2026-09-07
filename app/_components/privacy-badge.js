@@ -60,7 +60,8 @@ export function PrivacyBadge() {
         <div className="privacy-panel" role="dialog" aria-label="How privacy is enforced">
           <p className="privacy-lead">Your files never leave this device.</p>
           <ul className="privacy-points">
-            <li>There is no server. This is a static page with no backend, no database and no analytics.</li>
+            <li>There is no server. This is a static page with no backend and no database.</li>
+            <li>Page visits are counted, with no cookies and nothing that identifies you. Your documents are never part of it.</li>
             <li>The page is not permitted to send anything out, by policy the browser enforces.</li>
             <li>The offline cache only ever stores this app&apos;s own files, never your documents.</li>
           </ul>

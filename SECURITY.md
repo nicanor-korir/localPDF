@@ -19,7 +19,7 @@ The privacy claim is enforced, not merely intended:
   malicious document tried. The policy ships both as an HTTP header (`vercel.json`) and as a
   `<meta>` tag, so it holds even from `file://` or a non-Vercel static host.
 - **No server.** The app is a static export. There is no backend, no database, no logging and
-  no analytics — there is nowhere for a file to go.
+  and page visit counts that are cookieless and never touch a document. There is nowhere for a file to go.
 - **The service worker only ever caches the app's own assets.** It handles same-origin `GET`
   requests for files that shipped with the build. User documents never traverse the network at
   all, so they never reach it.

@@ -1,3 +1,4 @@
+import { Analytics } from '@vercel/analytics/next';
 import './globals.css';
 import { PROMISE, SITE, SITE_NAME, TAGLINE, applicationSchema, toolListSchema } from '../lib/seo';
 
@@ -100,7 +101,29 @@ export default function RootLayout({ children }) {
           dangerouslySetInnerHTML={{ __html: JSON.stringify(toolListSchema()) }}
         />
       </head>
-      <body>{children}</body>
+      <body>
+        {children}
+        {/*
+          Counting page visits, and nothing else.
+
+          ⚠️ Chosen specifically because it does not need the CSP opened. Vercel serves both
+          halves from this origin: the script at /_vercel/insights/script.js and the beacon at
+          /_vercel/insights/view, so `script-src 'self'` and the load-bearing
+          `connect-src 'self'` both stay exactly as they are. Google Analytics would have needed
+          two third-party origins allowed, and the Private badge reads the live policy aloud, so
+          it would have shown every visitor that outbound requests were now permitted. That is
+          the one claim this product cannot spend.
+
+          It is also cookieless, which is what keeps the agreement in lib/terms.js honest. If you
+          ever swap this for something that sets a cookie or posts to another origin, the copy
+          there and in privacy-badge.js has to change in the same commit, and the tests will
+          tell you so.
+
+          The service worker only intercepts GETs and passes anything it has not cached through
+          to the network, so this is a no-op offline rather than an error.
+        */}
+        <Analytics />
+      </body>
     </html>
   );
 }

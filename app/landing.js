@@ -94,7 +94,7 @@ export default function Landing() {
           <a href="#demo">See it work</a>
           <a href="#why">Why local</a>
           <a href="#tools">Tools</a>
-          <a href="https://github.com/nicanor-korir/merge-files-locally" rel="noreferrer noopener" target="_blank">
+          <a href="https://github.com/nicanor-korir/localPDF" rel="noreferrer noopener" target="_blank">
             GitHub
           </a>
           <Link href="/merge" className="btn btn-primary btn-sm lp-header-cta">
@@ -382,7 +382,7 @@ export default function Landing() {
         </div>
         <p className="lp-footer-legal">
           Open source, MIT licensed.{' '}
-          <a href="https://github.com/nicanor-korir/merge-files-locally" rel="noreferrer noopener" target="_blank">
+          <a href="https://github.com/nicanor-korir/localPDF" rel="noreferrer noopener" target="_blank">
             Read the code
           </a>{' '}
           if you would rather check than trust.

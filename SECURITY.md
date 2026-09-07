@@ -3,7 +3,7 @@
 ## Reporting a vulnerability
 
 Please report security issues privately through
-[GitHub Security Advisories](https://github.com/nicanor-korir/merge-files-locally/security/advisories/new)
+[GitHub Security Advisories](https://github.com/nicanor-korir/localPDF/security/advisories/new)
 rather than opening a public issue.
 
 Please include what you were doing, what happened, and — if the issue involves a crafted

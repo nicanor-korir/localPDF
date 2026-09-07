@@ -1501,11 +1501,12 @@ body {
    The landing page
    ==========================================================================
    Its own layout, deliberately. The tools are a working surface where chrome
-   should get out of the way; this is the one page whose job is to explain, so
-   it gets room to breathe and type large enough to be read from across a desk.
+   should get out of the way; this page has to explain, so it gets room and type
+   large enough to read from across a desk.
 
-   The one visual idea worth keeping: colour is used almost nowhere, so the two
-   places it does appear (the headline accent and the proof band) carry weight.
+   The idea holding it together: every other PDF site draws a cloud, because
+   their file goes somewhere. This one keeps drawing a boundary with your
+   machine on the inside, and never draws a way out of it.
    ========================================================================== */
 
 .lp {
@@ -1550,7 +1551,7 @@ body {
   margin-left: auto;
   display: flex;
   align-items: center;
-  gap: 26px;
+  gap: 24px;
   font-size: 0.88rem;
 }
 
@@ -1572,45 +1573,38 @@ body {
 
 /* --- Hero ----------------------------------------------------------------- */
 
-/* Two columns so the interactive half of the page is not left as empty margin on a wide
-   screen. The drop zone is the product; giving it a column of its own says so. */
 .lp-hero {
   max-width: var(--lp-max);
   margin: 0 auto;
-  padding: clamp(36px, 6vw, 84px) var(--lp-gutter) clamp(48px, 7vw, 88px);
+  padding: clamp(32px, 5vw, 72px) var(--lp-gutter) clamp(44px, 6vw, 80px);
   display: grid;
-  grid-template-columns: minmax(0, 1.18fr) minmax(0, 0.82fr);
+  grid-template-columns: minmax(0, 1.12fr) minmax(0, 0.88fr);
   gap: clamp(32px, 4.5vw, 56px);
   align-items: center;
 }
 
-.lp-hero-panel {
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
+.lp-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 14px 7px 11px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: var(--surface-raised);
+  box-shadow: var(--shadow-xs);
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  margin-bottom: 22px;
 }
 
-.lp-hero-panel-note {
-  font-size: 0.82rem;
-  line-height: 1.55;
-  color: var(--text-tertiary);
-  text-align: center;
-  max-width: 26rem;
-  margin: 0 auto;
-}
-
-.lp-eyebrow {
-  font-size: 0.78rem;
-  font-weight: 650;
-  letter-spacing: 0.09em;
-  text-transform: uppercase;
-  color: var(--primary);
-  margin-bottom: 20px;
+.lp-badge svg {
+  color: var(--success);
 }
 
 .lp h1 {
-  font-size: clamp(2.3rem, 6.2vw, 4rem);
-  line-height: 1.03;
+  font-size: clamp(2.3rem, 5.8vw, 3.9rem);
+  line-height: 1.04;
   letter-spacing: -0.035em;
   font-weight: 750;
 }
@@ -1620,74 +1614,25 @@ body {
 }
 
 .lp-lead {
-  margin-top: 22px;
-  max-width: 38rem;
-  font-size: clamp(1rem, 1.6vw, 1.12rem);
+  margin-top: 20px;
+  max-width: 36rem;
+  font-size: clamp(1rem, 1.5vw, 1.1rem);
   line-height: 1.62;
   color: var(--text-secondary);
 }
 
-/* The drop zone is the real control, not a picture of one. Someone who arrived
-   ready to work can start here without reading another word. */
-.lp-drop {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 7px;
-  padding: clamp(34px, 5vw, 52px) 24px;
-  border: 2px dashed var(--border-hover);
-  border-radius: var(--radius);
-  background: var(--surface-raised);
-  color: var(--text-secondary);
-  cursor: pointer;
-  text-align: center;
-  transition: border-color var(--transition), background var(--transition), transform var(--transition);
-}
-
-.lp-drop:hover,
-.lp-drop.is-dragging {
-  border-color: var(--primary);
-  background: var(--primary-light);
-  color: var(--primary);
-}
-
-.lp-drop.is-dragging {
-  transform: scale(1.01);
-}
-
-.lp-drop-title {
-  font-size: 1.02rem;
-  font-weight: 650;
-  color: var(--text);
-}
-
-.lp-drop:hover .lp-drop-title,
-.lp-drop.is-dragging .lp-drop-title {
-  color: var(--primary);
-}
-
-.lp-drop-hint {
-  font-size: 0.84rem;
-}
-
 .lp-trust {
-  margin-top: 22px;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px 26px;
+  margin-top: 24px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(168px, max-content));
+  gap: 11px 28px;
   list-style: none;
-  font-size: 0.86rem;
+  font-size: 0.87rem;
   color: var(--text-secondary);
 }
 
-.lp-trust li {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-/* A real tick: a disc, and two sides of a box rotated to make the check. An empty ring reads
-   as a bullet and says nothing at all. */
+/* A real tick: a disc, and two sides of a box rotated to make the check. An
+   empty ring reads as a bullet and says nothing at all. */
 .lp-trust li {
   position: relative;
   padding-left: 26px;
@@ -1718,6 +1663,72 @@ body {
   transform: rotate(45deg);
 }
 
+/* The drop zone is the real control, not a picture of one. Someone who arrived
+   ready to work can start here without reading another word. */
+.lp-hero-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 13px;
+}
+
+.lp-drop {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: clamp(28px, 4vw, 40px) 24px clamp(26px, 3.5vw, 34px);
+  border: 2px dashed var(--border-hover);
+  border-radius: var(--radius);
+  background: var(--surface-raised);
+  color: var(--text-secondary);
+  cursor: pointer;
+  text-align: center;
+  transition: border-color var(--transition), background var(--transition);
+}
+
+.lp-drop:hover,
+.lp-drop.is-dragging {
+  border-color: var(--primary);
+  background: var(--primary-light);
+}
+
+.lp-drop-icon {
+  display: grid;
+  place-items: center;
+  width: 62px;
+  height: 62px;
+  margin-bottom: 6px;
+  border-radius: 50%;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  color: var(--primary);
+}
+
+.lp-drop-title {
+  font-size: 1.04rem;
+  font-weight: 650;
+  color: var(--text);
+}
+
+.lp-drop-hint {
+  font-size: 0.82rem;
+}
+
+.lp-drop-button {
+  margin-top: 14px;
+  pointer-events: none;
+  padding: 11px 22px;
+}
+
+.lp-hero-panel-note {
+  font-size: 0.82rem;
+  line-height: 1.55;
+  color: var(--text-tertiary);
+  text-align: center;
+  max-width: 27rem;
+  margin: 0 auto;
+}
+
 /* --- Sections ------------------------------------------------------------- */
 
 .lp-section {
@@ -1727,21 +1738,466 @@ body {
 }
 
 .lp-section-head {
-  max-width: 40rem;
+  max-width: 42rem;
   margin-bottom: 34px;
 }
 
+.lp-kicker {
+  font-size: 0.76rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--primary);
+  margin-bottom: 12px;
+}
+
 .lp h2 {
-  font-size: clamp(1.5rem, 3.1vw, 2.1rem);
-  line-height: 1.15;
+  font-size: clamp(1.55rem, 3.2vw, 2.15rem);
+  line-height: 1.14;
   letter-spacing: -0.028em;
   font-weight: 720;
 }
 
-.lp-section-head p {
+.lp-section-head p:not(.lp-kicker) {
   margin-top: 12px;
   color: var(--text-secondary);
   line-height: 1.62;
+}
+
+/* --- The demo ------------------------------------------------------------- */
+
+.demo {
+  display: grid;
+  grid-template-columns: minmax(0, 0.78fr) minmax(0, 1.22fr);
+  gap: clamp(20px, 3vw, 36px);
+  align-items: start;
+}
+
+.demo-tabs {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.demo-tab {
+  text-align: left;
+  padding: 14px 16px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  cursor: pointer;
+  transition: border-color var(--transition), background var(--transition);
+}
+
+.demo-tab:hover {
+  border-color: var(--border-hover);
+}
+
+.demo-tab.is-active {
+  border-color: var(--primary);
+  background: var(--primary-light);
+}
+
+.demo-tab-label {
+  display: block;
+  font-weight: 650;
+  font-size: 0.95rem;
+  color: var(--text);
+}
+
+.demo-tab.is-active .demo-tab-label {
+  color: var(--primary);
+}
+
+/* The explanation only belongs to the tab you are on; showing five at once is a
+   wall of text nobody reads. */
+.demo-tab-line {
+  display: block;
+  font-size: 0.84rem;
+  line-height: 1.45;
+  color: var(--text-secondary);
+  max-height: 0;
+  opacity: 0;
+  overflow: hidden;
+  transition: max-height var(--transition), opacity var(--transition), margin var(--transition);
+}
+
+.demo-tab.is-active .demo-tab-line {
+  max-height: 4.5rem;
+  opacity: 1;
+  margin-top: 5px;
+}
+
+/* The frame is the argument: a window titled "Your computer", with no way out
+   drawn anywhere on it. */
+.demo-frame {
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--bg);
+  box-shadow: var(--shadow);
+  overflow: hidden;
+}
+
+.demo-frame-bar {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 11px 14px;
+  border-bottom: 1px solid var(--border);
+  background: var(--surface);
+}
+
+.demo-frame-bar > span {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: var(--border-hover);
+}
+
+.demo-frame-title {
+  margin-left: 8px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--text-tertiary);
+}
+
+.demo-canvas {
+  position: relative;
+  height: clamp(268px, 30vw, 340px);
+  display: grid;
+  place-items: center;
+  padding: 26px;
+}
+
+.demo-sheet {
+  position: absolute;
+  width: 166px;
+  height: 220px;
+  padding: 18px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  border-radius: 8px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-sm);
+  transition: transform 520ms cubic-bezier(0.22, 0.8, 0.3, 1), opacity 380ms ease;
+}
+
+.demo-sheet-a {
+  z-index: 3;
+}
+
+.demo-sheet-b,
+.demo-sheet-c {
+  opacity: 0;
+  z-index: 1;
+}
+
+.demo-rule {
+  height: 6px;
+  border-radius: 3px;
+  background: var(--border);
+  transition: background 320ms ease, transform 320ms ease;
+}
+
+.w-90 { width: 90%; }
+.w-85 { width: 85%; }
+.w-80 { width: 80%; }
+.w-70 { width: 70%; }
+.w-60 { width: 60%; }
+.w-50 { width: 50%; }
+
+.demo-photo {
+  height: 46px;
+  border-radius: 5px;
+  background: linear-gradient(120deg, var(--primary-light), #d7ddfb);
+  transition: filter 420ms ease;
+}
+
+.demo-lock,
+.demo-size {
+  position: absolute;
+  z-index: 4;
+  opacity: 0;
+  transition: opacity 320ms ease, transform 420ms cubic-bezier(0.22, 0.8, 0.3, 1);
+}
+
+.demo-lock {
+  display: grid;
+  place-items: center;
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  background: var(--primary);
+  color: var(--on-primary);
+  box-shadow: 0 8px 20px var(--primary-glow);
+  transform: scale(0.6);
+}
+
+.demo-size {
+  bottom: 26px;
+  padding: 7px 14px;
+  border-radius: 999px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-sm);
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  transform: translateY(8px);
+}
+
+.demo-size b {
+  color: var(--text);
+}
+
+.demo-caption {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 11px 16px;
+  border-top: 1px solid var(--border);
+  background: var(--surface);
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--success);
+}
+
+.demo-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--success);
+}
+
+/* Merge: two more documents slide in behind, and the stack becomes one. */
+.state-merge .demo-sheet-b {
+  opacity: 1;
+  transform: translate(-26px, -12px) rotate(-5deg);
+}
+
+.state-merge .demo-sheet-c {
+  opacity: 1;
+  transform: translate(26px, 12px) rotate(5deg);
+}
+
+/* Split: the document comes apart, cleanly, into two. */
+.state-split .demo-sheet-a {
+  transform: translateX(-94px);
+}
+
+.state-split .demo-sheet-b {
+  opacity: 1;
+  transform: translateX(94px);
+  z-index: 3;
+}
+
+/* Compress: the same document, smaller, with the numbers to prove it. */
+.state-compress .demo-sheet-a {
+  transform: scale(0.72);
+}
+
+.state-compress .demo-photo {
+  filter: saturate(0.85) contrast(0.94);
+}
+
+.state-compress .demo-size {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/*
+  Redact: a black bar is what every other tool leaves behind, and it is exactly the thing this
+  tool does not do. So the bar lands, and then it takes the words with it. What is left is
+  empty paper, which is what the file actually contains afterwards.
+*/
+.state-redact .demo-secret {
+  animation: demo-redact 2s cubic-bezier(0.22, 0.8, 0.3, 1) forwards;
+}
+
+.state-redact .demo-secret-2 {
+  animation: demo-redact 2s cubic-bezier(0.22, 0.8, 0.3, 1) 180ms forwards;
+}
+
+@keyframes demo-redact {
+  0% {
+    background: var(--border);
+    transform: scaleX(1);
+  }
+  22%,
+  62% {
+    background: var(--lp-ink);
+    transform: scaleX(1);
+  }
+  100% {
+    background: var(--lp-ink);
+    transform: scaleX(0);
+  }
+}
+
+.demo-secret,
+.demo-secret-2 {
+  transform-origin: left center;
+}
+
+/* Protect: a lock, and the page behind it goes quiet. */
+.state-protect .demo-sheet-a {
+  filter: blur(2.5px);
+  opacity: 0.55;
+}
+
+.state-protect .demo-lock {
+  opacity: 1;
+  transform: scale(1);
+}
+
+/* --- Why local ------------------------------------------------------------ */
+
+.lp-why {
+  background: var(--bg);
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+}
+
+.lp-why-inner {
+  max-width: var(--lp-max);
+  margin: 0 auto;
+  padding: clamp(48px, 6.5vw, 88px) var(--lp-gutter);
+}
+
+.lp-why-head {
+  margin-bottom: 30px;
+}
+
+.lp-compare {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(290px, 1fr));
+  gap: 16px;
+}
+
+.lp-compare-col {
+  padding: 24px;
+  border-radius: var(--radius);
+  background: var(--surface);
+  border: 1px solid var(--border);
+}
+
+.lp-compare-col h3 {
+  font-size: 1.06rem;
+  font-weight: 690;
+  letter-spacing: -0.015em;
+  margin-bottom: 16px;
+}
+
+.lp-compare-tag {
+  display: block;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  margin-bottom: 6px;
+  color: var(--text-tertiary);
+}
+
+.lp-compare-col ol {
+  list-style: none;
+  counter-reset: step;
+  display: grid;
+  gap: 12px;
+}
+
+.lp-compare-col li {
+  counter-increment: step;
+  position: relative;
+  padding-left: 32px;
+  font-size: 0.9rem;
+  line-height: 1.5;
+  color: var(--text-secondary);
+}
+
+.lp-compare-col li::before {
+  content: counter(step);
+  position: absolute;
+  left: 0;
+  top: -1px;
+  display: grid;
+  place-items: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  font-size: 0.74rem;
+  font-weight: 700;
+}
+
+/* The dud path is drawn as a dud: dashed, grey, going nowhere good. */
+.is-usual {
+  border-style: dashed;
+  background: transparent;
+}
+
+.is-usual li::before {
+  background: var(--border);
+  color: var(--text-secondary);
+}
+
+.is-local {
+  border-color: var(--primary);
+  box-shadow: 0 8px 26px var(--primary-glow);
+}
+
+.is-local .lp-compare-tag {
+  color: var(--primary);
+}
+
+.is-local li::before {
+  background: var(--primary);
+  color: var(--on-primary);
+}
+
+.is-local li {
+  color: var(--text);
+}
+
+.lp-reasons {
+  list-style: none;
+  margin-top: 32px;
+  display: grid;
+  gap: 26px 34px;
+  /* Four reasons, so four columns where there is room: three leaves the last one stranded
+     alone on a second row, which reads as an afterthought rather than as the last point. */
+  grid-template-columns: repeat(4, 1fr);
+}
+
+@media (max-width: 1080px) {
+  .lp-reasons {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.lp-reasons h3 {
+  font-size: 0.99rem;
+  font-weight: 680;
+  letter-spacing: -0.015em;
+  padding-top: 15px;
+  border-top: 2px solid var(--primary);
+}
+
+.lp-reasons p {
+  margin-top: 8px;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  font-size: 0.9rem;
+}
+
+.lp-why-proof {
+  margin-top: 34px;
+  padding: 18px 22px;
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  font-size: 0.9rem;
+  line-height: 1.6;
+  color: var(--text-secondary);
 }
 
 /* --- Tool grid ------------------------------------------------------------ */
@@ -1806,118 +2262,173 @@ body {
   color: var(--text-secondary);
 }
 
-/* --- The proof band ------------------------------------------------------- */
+/* --- How it works --------------------------------------------------------- */
 
-.lp-proof {
-  background: var(--lp-ink);
-  color: #e9ecf5;
+.lp-steps {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 0.86fr);
+  gap: clamp(28px, 4vw, 56px);
+  align-items: center;
+  padding: clamp(28px, 4vw, 44px);
+  border-radius: var(--radius);
+  background: var(--surface-raised);
+  border: 1px solid var(--border);
+  border-left: 4px solid var(--primary);
 }
 
-.lp-proof-inner {
-  max-width: var(--lp-max);
-  margin: 0 auto;
-  padding: clamp(48px, 7vw, 88px) var(--lp-gutter);
+.lp-steps-list {
+  list-style: none;
+  margin-top: 24px;
   display: grid;
-  gap: clamp(28px, 5vw, 60px);
-  grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
+  gap: 18px;
+}
+
+.lp-steps-list li {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 14px;
   align-items: start;
 }
 
-.lp-proof h2 {
-  color: #fff;
-}
-
-.lp-proof p {
-  margin-top: 16px;
-  line-height: 1.68;
-  color: #b9c0d4;
-  max-width: 34rem;
-}
-
-.lp-proof-note strong {
-  color: #fff;
-}
-
-/* Plain language, not a code sample. "connect-src 'self'" is the honest answer to how this
-   works, and it is meaningless to almost everyone who reads it. The technical version is one
-   click away behind the Private badge, where the people who want it will look. */
-.lp-journey {
-  margin: 0;
-  padding: 26px 26px 22px;
-  border-radius: var(--radius);
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.12);
-}
-
-.lp-journey figcaption {
-  font-size: 0.74rem;
-  text-transform: uppercase;
-  letter-spacing: 0.09em;
+.lp-steps-list strong {
+  display: block;
+  margin-bottom: 3px;
   font-weight: 650;
-  color: #8f98b5;
-  margin-bottom: 18px;
 }
 
-.lp-journey ul {
-  list-style: none;
-  display: grid;
-  gap: 14px;
-}
-
-.lp-journey li {
-  position: relative;
-  padding-left: 32px;
-  font-size: 0.96rem;
-  line-height: 1.5;
-  color: #e9ecf5;
-}
-
-.lp-journey li::before {
-  content: '';
-  position: absolute;
-  left: 0;
-  top: 1px;
-  width: 20px;
-  height: 20px;
-  border-radius: 50%;
-  background: rgba(142, 230, 184, 0.16);
-  border: 1px solid rgba(142, 230, 184, 0.5);
-}
-
-.lp-journey li::after {
-  content: '';
-  position: absolute;
-  left: 7px;
-  top: 6px;
-  width: 5px;
-  height: 9px;
-  border-right: 2px solid #8ee6b8;
-  border-bottom: 2px solid #8ee6b8;
-  transform: rotate(45deg);
-}
-
-/* --- Highlights ----------------------------------------------------------- */
-
-.lp-highlights {
-  list-style: none;
-  display: grid;
-  gap: clamp(20px, 3vw, 40px);
-  grid-template-columns: repeat(auto-fit, minmax(248px, 1fr));
-}
-
-.lp-highlights h3 {
-  font-size: 1.03rem;
-  font-weight: 680;
-  letter-spacing: -0.015em;
-  padding-top: 16px;
-  border-top: 2px solid var(--primary);
-}
-
-.lp-highlights p {
-  margin-top: 9px;
+.lp-steps-list span:last-child {
   color: var(--text-secondary);
-  line-height: 1.62;
+  line-height: 1.58;
   font-size: 0.92rem;
+}
+
+.lp-step-number {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--primary);
+  color: var(--on-primary);
+  font-size: 0.82rem;
+  font-weight: 700;
+}
+
+.lp-steps-cta {
+  margin-top: 26px;
+  display: inline-flex;
+  padding: 12px 26px;
+  text-decoration: none;
+}
+
+/* The boundary, held still. Your machine on the inside, the internet outside,
+   and deliberately no line joining them. */
+.lp-boundary {
+  position: relative;
+  padding: 30px;
+  border-radius: var(--radius);
+  border: 2px dashed var(--border-hover);
+  background: var(--surface);
+}
+
+.lp-boundary-outside {
+  position: absolute;
+  top: 10px;
+  right: 16px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-tertiary);
+}
+
+.lp-boundary-inside {
+  padding: 20px;
+  border-radius: var(--radius-sm);
+  background: var(--primary-light);
+  border: 1px solid var(--primary);
+}
+
+.lp-boundary-label {
+  display: block;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--primary);
+  margin-bottom: 14px;
+}
+
+.lp-boundary-doc {
+  display: grid;
+  gap: 7px;
+  padding: 16px;
+  border-radius: 7px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+}
+
+.lp-boundary-doc span {
+  height: 7px;
+  border-radius: 4px;
+  background: var(--border);
+}
+
+.lp-boundary-doc span:nth-child(1) { width: 72%; }
+.lp-boundary-doc span:nth-child(2) { width: 92%; }
+.lp-boundary-doc span:nth-child(3) { width: 60%; }
+
+.lp-boundary-tools {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+  margin-top: 14px;
+}
+
+.lp-boundary-tools span {
+  padding: 5px 11px;
+  border-radius: 999px;
+  background: var(--surface);
+  border: 1px solid var(--primary);
+  color: var(--primary);
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.lp-boundary-gate {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 22px 0 18px;
+}
+
+.lp-boundary-gate::before,
+.lp-boundary-gate::after {
+  content: '';
+  flex: 1;
+  border-top: 2px dashed var(--border-hover);
+}
+
+.lp-boundary-block {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 5px 13px 5px 9px;
+  border-radius: 999px;
+  background: var(--surface);
+  border: 1px solid var(--border-hover);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+  white-space: nowrap;
+}
+
+.lp-boundary-block svg {
+  width: 15px;
+  height: 15px;
+  flex-shrink: 0;
 }
 
 /* --- FAQ ------------------------------------------------------------------ */
@@ -1998,8 +2509,12 @@ body {
 .lp-footer-tools {
   list-style: none;
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(96px, max-content));
-  gap: 9px 30px;
+  /* Ten tools down one column left a tall ladder against an empty half of the footer. Four
+     rows, filled column by column, keeps them in one readable block. */
+  grid-template-rows: repeat(4, auto);
+  grid-auto-flow: column;
+  gap: 10px 44px;
+  justify-content: end;
   font-size: 0.88rem;
 }
 
@@ -2024,6 +2539,16 @@ body {
   color: var(--text-secondary);
 }
 
+@media (max-width: 980px) {
+  .demo {
+    grid-template-columns: 1fr;
+  }
+
+  .lp-steps {
+    grid-template-columns: 1fr;
+  }
+}
+
 @media (max-width: 900px) {
   .lp-hero {
     grid-template-columns: 1fr;
@@ -2035,14 +2560,16 @@ body {
   }
 }
 
-@media (max-width: 860px) {
-  .lp-proof-inner {
+@media (max-width: 620px) {
+  /* The two fixed grids on this page: everything else is auto-fit and folds on its own. */
+  .lp-reasons {
     grid-template-columns: 1fr;
   }
 
-  /* The secondary links go before the button rather than crowding it out. */
-  .lp-header-links {
-    gap: 18px;
+  .lp-footer-tools {
+    grid-template-rows: repeat(5, auto);
+    justify-content: start;
+    gap: 10px 36px;
   }
 }
 
@@ -2051,8 +2578,8 @@ body {
     display: none;
   }
 
-  .lp-drop {
-    padding: 26px 18px;
+  .demo-canvas {
+    height: 260px;
   }
 }
 

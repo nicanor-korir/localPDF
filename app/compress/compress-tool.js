@@ -4,6 +4,7 @@ import { useCallback, useMemo, useRef, useState } from 'react';
 import { buildDownloadName, formatSize, isAcceptedFile } from '../../lib/file-types';
 import { COMPRESSION_LEVELS, DEFAULT_COMPRESSION_LEVEL } from '../../lib/pdf-images';
 import { runCrypto } from '../../lib/run-pdf';
+import { ToolIntro } from '../_components/tool-intro';
 import { DropZone } from '../_components/drop-zone';
 import { LiveRegion, ProgressOverlay, Toast } from '../_components/feedback';
 import { ToolShell } from '../_components/tool-shell';
@@ -131,6 +132,8 @@ export default function CompressTool() {
             label="Browse for a PDF to compress"
             hint="PDF only"
           />
+
+          {!file && <ToolIntro id="compress" />}
 
           {file && (
             <section className="tool-panel" aria-label="Compression">

@@ -4,6 +4,7 @@ import { useCallback, useMemo, useRef, useState } from 'react';
 import { createZip } from '../../lib/zip';
 import { createDocx } from '../../lib/docx';
 import { toMarkdown, toPlainText } from '../../lib/text-layout';
+import { ToolIntro } from '../_components/tool-intro';
 import { DropZone } from '../_components/drop-zone';
 import { LiveRegion, ProgressOverlay, Toast } from '../_components/feedback';
 import { PageGrid } from '../_components/page-grid';
@@ -129,6 +130,8 @@ export default function ConvertTool() {
       <main className={`layout${files.length === 0 ? ' layout-centered' : ''}`}>
         <div className={`panel-left${files.length === 0 ? ' panel-centered' : ''}`}>
           <DropZone onFiles={addFiles} label="Browse for a PDF or image to convert" />
+
+          {files.length === 0 && <ToolIntro id="convert" />}
 
           {files.length > 0 && (
             <SourceList session={session}>

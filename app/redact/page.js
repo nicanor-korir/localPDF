@@ -1,12 +1,14 @@
+import { metadataForTool } from '../../lib/seo';
+import { ToolSchema } from '../_components/tool-schema';
 import RedactTool from './redact-tool';
 
-export const metadata = {
-  title: 'Redact a PDF',
-  description:
-    'Remove content from a PDF for good, not just cover it with a black box. Everything runs locally in your browser — your file never leaves your device.',
-  alternates: { canonical: '/redact' },
-};
+export const metadata = metadataForTool('redact');
 
 export default function RedactPageRoute() {
-  return <RedactTool />;
+  return (
+    <>
+      <ToolSchema id="redact" />
+      <RedactTool />
+    </>
+  );
 }

@@ -4,6 +4,7 @@ import { useCallback, useMemo, useState } from 'react';
 import { buildDownloadName } from '../../lib/file-types';
 import { DEFAULT_SPLIT_MODE, SPLIT_MODES, planSplit, splitPartName } from '../../lib/page-selection';
 import { sanitizeDownloadName } from '../../lib/output-settings';
+import { ToolIntro } from '../_components/tool-intro';
 import { DropZone } from '../_components/drop-zone';
 import { LiveRegion, ProgressOverlay, Toast } from '../_components/feedback';
 import { PageGrid } from '../_components/page-grid';
@@ -78,6 +79,8 @@ export default function SplitTool() {
       <main className={`layout${files.length === 0 ? ' layout-centered' : ''}`}>
         <div className={`panel-left${files.length === 0 ? ' panel-centered' : ''}`}>
           <DropZone onFiles={addFiles} label="Browse for a PDF to split" />
+
+          {files.length === 0 && <ToolIntro id="split" />}
 
           {files.length > 0 && (
             <SourceList session={session}>

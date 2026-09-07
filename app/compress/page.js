@@ -1,12 +1,14 @@
+import { metadataForTool } from '../../lib/seo';
+import { ToolSchema } from '../_components/tool-schema';
 import CompressTool from './compress-tool';
 
-export const metadata = {
-  title: 'Compress a PDF',
-  description:
-    'Make a PDF smaller by re-encoding its images. Everything runs locally in your browser — your file never leaves your device.',
-  alternates: { canonical: '/compress' },
-};
+export const metadata = metadataForTool('compress');
 
 export default function CompressPage() {
-  return <CompressTool />;
+  return (
+    <>
+      <ToolSchema id="compress" />
+      <CompressTool />
+    </>
+  );
 }

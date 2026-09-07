@@ -11,6 +11,7 @@ import {
   removeOverlay,
   setBox,
 } from '../../lib/overlays';
+import { ToolIntro } from '../_components/tool-intro';
 import { DropZone } from '../_components/drop-zone';
 import { LiveRegion, ProgressOverlay, Toast } from '../_components/feedback';
 import { SourceList } from '../_components/source-list';
@@ -166,6 +167,8 @@ export default function RedactTool() {
       <main className={`layout${files.length === 0 ? ' layout-centered' : ''}`}>
         <div className={`panel-left${files.length === 0 ? ' panel-centered' : ''}`}>
           <DropZone onFiles={addFiles} label="Browse for a PDF to redact" />
+
+          {files.length === 0 && <ToolIntro id="redact" />}
 
           {files.length > 0 && (
             <SourceList session={session}>

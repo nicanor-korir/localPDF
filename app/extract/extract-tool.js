@@ -4,6 +4,7 @@ import { useCallback, useState } from 'react';
 import { buildDownloadName } from '../../lib/file-types';
 import { sanitizeDownloadName } from '../../lib/output-settings';
 import { formatPageRanges, parsePageRanges } from '../../lib/page-selection';
+import { ToolIntro } from '../_components/tool-intro';
 import { DropZone } from '../_components/drop-zone';
 import { LiveRegion, ProgressOverlay, Toast } from '../_components/feedback';
 import { PageGrid } from '../_components/page-grid';
@@ -73,6 +74,8 @@ export default function ExtractTool() {
       <main className={`layout${files.length === 0 ? ' layout-centered' : ''}`}>
         <div className={`panel-left${files.length === 0 ? ' panel-centered' : ''}`}>
           <DropZone onFiles={addFiles} label="Browse for a PDF to extract pages from" />
+
+          {files.length === 0 && <ToolIntro id="extract" />}
 
           {files.length > 0 && (
             <SourceList session={session}>

@@ -1,19 +1,26 @@
 import './globals.css';
+import { PROMISE, SITE, SITE_NAME, TAGLINE, applicationSchema, toolListSchema } from '../lib/seo';
 
-const SITE = 'https://merge-pdf.nicanor.xyz';
-const DESCRIPTION =
-  'Merge PDFs and images into one PDF. Everything runs locally in your browser — your files never leave your device.';
+const DESCRIPTION = `${TAGLINE}. ${PROMISE}`;
 
 export const metadata = {
   metadataBase: new URL(SITE),
-  // A template so each tool page names itself in the tab and in search results, while the
-  // home page keeps the title the site is already known by.
+  // A template so each tool page leads with what it does — which is what someone searched for
+  // — and the brand follows.
   title: {
-    default: 'PDF Merger — Local & Private',
-    template: '%s — Local & Private',
+    default: `${SITE_NAME} — ${TAGLINE}`,
+    template: `%s — ${SITE_NAME}`,
   },
   description: DESCRIPTION,
-  applicationName: 'PDF Merger',
+  applicationName: SITE_NAME,
+  keywords: [
+    'merge pdf', 'split pdf', 'compress pdf', 'edit pdf', 'redact pdf',
+    'unlock pdf', 'password protect pdf', 'pdf to word', 'pdf to image',
+    'offline pdf editor', 'private pdf tools',
+  ],
+  authors: [{ name: 'Nicanor Korir', url: 'https://nicanor.xyz' }],
+  creator: 'Nicanor Korir',
+  alternates: { canonical: '/' },
   manifest: '/manifest.webmanifest',
   icons: {
     icon: [
@@ -25,14 +32,15 @@ export const metadata = {
   openGraph: {
     type: 'website',
     url: SITE,
-    siteName: 'PDF Merger',
-    title: 'PDF Merger — Local & Private',
+    siteName: SITE_NAME,
+    title: `${SITE_NAME} — ${TAGLINE}`,
     description: DESCRIPTION,
-    images: [{ url: '/og.png', width: 1200, height: 630, alt: 'PDF Merger' }],
+    locale: 'en_GB',
+    images: [{ url: '/og.png', width: 1200, height: 630, alt: `${SITE_NAME} — ${TAGLINE}` }],
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'PDF Merger — Local & Private',
+    title: `${SITE_NAME} — ${TAGLINE}`,
     description: DESCRIPTION,
     images: ['/og.png'],
   },
@@ -78,6 +86,19 @@ export default function RootLayout({ children }) {
       <head>
         <meta httpEquiv="Content-Security-Policy" content={CSP} />
         <meta name="referrer" content="no-referrer" />
+        {/*
+          Structured data, so a search engine can describe the app rather than guess at it. Two
+          blocks: what this is, and what it can do. `application/ld+json` is data, not code —
+          nothing here executes.
+        */}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(applicationSchema()) }}
+        />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(toolListSchema()) }}
+        />
       </head>
       <body>{children}</body>
     </html>

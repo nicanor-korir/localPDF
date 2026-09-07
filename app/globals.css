@@ -900,6 +900,43 @@ body {
   border-radius: var(--radius-xs);
 }
 
+/* --- What the tool is, shown only while it is empty ------------------------ */
+
+.tool-intro {
+  margin-top: 20px;
+  max-width: 48ch;
+  color: var(--text-secondary);
+  font-size: 0.86rem;
+  line-height: 1.6;
+}
+
+.tool-intro-lead {
+  color: var(--text);
+}
+
+.tool-intro-heading {
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-tertiary);
+  margin: 22px 0 10px;
+}
+
+.tool-faq-item + .tool-faq-item {
+  margin-top: 14px;
+}
+
+.tool-faq dt {
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 3px;
+}
+
+.tool-faq dd {
+  margin: 0;
+}
+
 /* --- Redaction ------------------------------------------------------------ */
 
 .redact-layer {

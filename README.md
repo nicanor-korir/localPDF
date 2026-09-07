@@ -1,6 +1,6 @@
-# PDF Merger
+# LocalPDF
 
-A privacy-focused set of PDF tools. All processing happens locally in your browser — your
+**PDF tools that never upload your files.** All processing happens locally in your browser — your
 files never leave your device, and the Content-Security-Policy blocks every outbound request
 so they physically cannot.
 
@@ -15,16 +15,16 @@ I can't trust some files on online tools, so I built a simple local solution
 
 | Tool | What it does |
 | --- | --- |
-| **[Merge](https://merge-pdf.nicanor.xyz/)** | Combine PDFs and images into one document |
-| **[Organise](https://merge-pdf.nicanor.xyz/organise)** | Reorder, rotate, crop and delete pages, or add a blank one, keeping each page's original size |
-| **[Extract](https://merge-pdf.nicanor.xyz/extract)** | Make a new PDF from the pages you pick |
-| **[Split](https://merge-pdf.nicanor.xyz/split)** | Break one PDF into several files — by range, every N pages, or one per page — downloaded as a zip |
-| **[Unlock](https://merge-pdf.nicanor.xyz/unlock)** | Remove a password you know, or restrictions that need no password at all |
-| **[Protect](https://merge-pdf.nicanor.xyz/protect)** | Add an AES-256 password and restrict printing, copying or editing |
-| **[Convert](https://merge-pdf.nicanor.xyz/convert)** | Turn a PDF into PNG or JPEG images, plain text, Markdown or a Word document |
-| **[Compress](https://merge-pdf.nicanor.xyz/compress)** | Make a PDF smaller by re-encoding its images — never returns a bigger file |
-| **[Edit](https://merge-pdf.nicanor.xyz/edit)** | Add text and images on top of a page, and drag them into place |
-| **[Redact](https://merge-pdf.nicanor.xyz/redact)** | Remove content for good — and check it is gone before downloading |
+| **[Merge](https://localpdf.nicanor.xyz/)** | Combine PDFs and images into one document |
+| **[Organise](https://localpdf.nicanor.xyz/organise)** | Reorder, rotate, crop and delete pages, or add a blank one, keeping each page's original size |
+| **[Extract](https://localpdf.nicanor.xyz/extract)** | Make a new PDF from the pages you pick |
+| **[Split](https://localpdf.nicanor.xyz/split)** | Break one PDF into several files — by range, every N pages, or one per page — downloaded as a zip |
+| **[Unlock](https://localpdf.nicanor.xyz/unlock)** | Remove a password you know, or restrictions that need no password at all |
+| **[Protect](https://localpdf.nicanor.xyz/protect)** | Add an AES-256 password and restrict printing, copying or editing |
+| **[Convert](https://localpdf.nicanor.xyz/convert)** | Turn a PDF into PNG or JPEG images, plain text, Markdown or a Word document |
+| **[Compress](https://localpdf.nicanor.xyz/compress)** | Make a PDF smaller by re-encoding its images — never returns a bigger file |
+| **[Edit](https://localpdf.nicanor.xyz/edit)** | Add text and images on top of a page, and drag them into place |
+| **[Redact](https://localpdf.nicanor.xyz/redact)** | Remove content for good — and check it is gone before downloading |
 
 Your files carry over between tools — merge a few documents, switch to Organise to rearrange
 them, then Split the result, without loading anything twice. Nothing is written to disk on the
@@ -63,7 +63,7 @@ engine decisions were made.
 
 ## Install it
 
-Open [merge-pdf.nicanor.xyz](https://merge-pdf.nicanor.xyz) and use your browser's "Install"
+Open [localpdf.nicanor.xyz](https://localpdf.nicanor.xyz) and use your browser's "Install"
 or "Add to Home Screen" option. After that it launches like any other app and works with no
 connection at all.
 

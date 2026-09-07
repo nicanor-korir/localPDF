@@ -1,8 +1,8 @@
 {
-  "name": "merge-my-pdf-files-locally",
+  "name": "localpdf",
   "version": "1.0.0",
   "type": "module",
-  "description": "i can't trust some files on online tools, building a simple local solution",
+  "description": "PDF tools that never upload your files \u2014 everything runs in your browser",
   "private": true,
   "scripts": {
     "dev": "node scripts/dev.mjs",

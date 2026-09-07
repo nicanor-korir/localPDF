@@ -1,12 +1,14 @@
+import { metadataForTool } from '../../lib/seo';
+import { ToolSchema } from '../_components/tool-schema';
 import EditTool from './edit-tool';
 
-export const metadata = {
-  title: 'Edit a PDF',
-  description:
-    'Add text and images to a PDF page. Everything runs locally in your browser — your file never leaves your device.',
-  alternates: { canonical: '/edit' },
-};
+export const metadata = metadataForTool('edit');
 
-export default function EditPage() {
-  return <EditTool />;
+export default function EditPageRoute() {
+  return (
+    <>
+      <ToolSchema id="edit" />
+      <EditTool />
+    </>
+  );
 }

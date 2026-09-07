@@ -203,20 +203,15 @@ function writeIcon(name, size) {
   return name;
 }
 
-function writeSocialCard(name, width, height) {
-  const canvas = createCanvas(width, height, BRAND);
-  const mark = Math.round(height * 0.62);
-  drawMark(canvas, mark, Math.round((width - mark) / 2), Math.round((height - mark) / 2), false);
-  writeFileSync(join(PUBLIC, name), encodePng(width, height, canvas.px));
-  return name;
-}
-
 mkdirSync(PUBLIC, { recursive: true });
 const written = [
   writeIcon('icon-192.png', 192),
   writeIcon('icon-512.png', 512),
   writeIcon('apple-touch-icon.png', 180),
   writeIcon('favicon-32.png', 32),
-  writeSocialCard('og.png', 1200, 630),
+  // og.png is NOT generated here any more. The social card carries the wordmark and the
+  // tagline, and this encoder has no way to draw text — it writes PNGs with node's zlib and
+  // nothing else. The card was rendered once on a canvas and checked in; see docs/ROADMAP.md.
+  // Regenerating it here would silently replace it with a mark on a plain ground.
 ];
 console.log(`Generated ${written.length} images: ${written.join(', ')}`);

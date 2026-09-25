@@ -20,7 +20,7 @@
   },
   "dependencies": {
     "@vercel/analytics": "^2.0.1",
-    "next": "^16.3.4",
+    "next": "^16.3.5",
     "pdf-lib": "^1.17.1",
     "pdfjs-dist": "^6.3.289",
     "react": "^19.2.8",
